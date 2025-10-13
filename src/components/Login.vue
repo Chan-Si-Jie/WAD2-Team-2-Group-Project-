@@ -3,7 +3,7 @@
     <div class="login-container">
       <!-- BACK BUTTON INSIDE CARD -->
       <div class="back-button" @click="$router.push('/')">
-        <img src="@/assets/back-arrow.png" alt="Back" />
+        <img :src="backArrow" alt="Back" />
       </div>
 
       <h2>Welcome Back</h2>
@@ -39,6 +39,7 @@
 </template>
 
 <script setup>
+import backArrow from "@/assets/back-arrow.png"; // import the image
 const login = () => {
   alert("This is a demo login. You can now proceed to the next page!");
 };
