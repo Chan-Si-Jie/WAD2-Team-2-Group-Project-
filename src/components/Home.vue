@@ -68,6 +68,35 @@
       </div>
     </section>
 
+    <!-- ABOUT SECTION -->
+
+    <section class="about" id="about">
+    
+      <h2>About</h2>
+      <p>
+        SmartCal is an intuitive calorie tracking app developed by a team of students 
+        from SMU as part of our Web Application Development course. Our mission is to help individuals
+        lead healthier lives by making nutrition tracking simple, fun, and visually appealing. We also don't mind if we score well for 
+        this project :). We hope you enjoy using SmartCal as much as we enjoyed building it!. 
+      </p>
+
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact" id="contact">
+      <h2>Contact Us</h2>
+      <p>
+        Have questions, feedback, or need support? We'd love to hear from you!
+        Reach out to us at:
+      </p>
+      <ul class="contact-list">
+        <li>Email: <a>hello@smartcal.com</a></li> 
+        <li>Phone: <a>+65 9888 8999</a></li>
+        <li>Address: <a>80 Stamford Rd, Singapore 178902</a></li>
+
+      </ul>
+    </section>
+
     <!-- FOOTER -->
     <footer>&copy; 2025 SmartCal. All rights reserved.</footer>
   </div>
