@@ -22,6 +22,10 @@
   background-color: #007bff;
   padding: 0.8rem 2rem;
   color: white;
+  position: sticky; 
+  top: 0;
+  z-index: 1000;
+  
 }
 
 .navbar h1 {
