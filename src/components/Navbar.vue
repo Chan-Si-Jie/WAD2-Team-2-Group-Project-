@@ -3,7 +3,7 @@
     <h1 @click="$router.push('/')">SmartCal</h1>
     <ul class="nav-links">
       <!-- <li><a @click="$router.push('/')">Home</a></li> -->
-      <li><a href="#home-page">Home</a></li>
+      <li><a href="#">Home</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#contact">Contact</a></li>
@@ -22,10 +22,9 @@
   background-color: #007bff;
   padding: 0.8rem 2rem;
   color: white;
-  position: sticky; 
+  position: sticky;
   top: 0;
   z-index: 1000;
-  
 }
 
 .navbar h1 {

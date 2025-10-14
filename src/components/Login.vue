@@ -33,7 +33,10 @@
         <button type="submit">Login</button>
       </form>
 
-      <p class="signup-text">Don't have an account? <a href="#">Sign Up</a></p>
+      <p class="signup-text">
+        Don't have an account?
+        <a href="#" @click.prevent="$router.push('/register')">Sign Up</a>
+      </p>
     </div>
   </div>
 </template>
