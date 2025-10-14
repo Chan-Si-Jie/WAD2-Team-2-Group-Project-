@@ -1,14 +1,27 @@
+<script setup>
+import { useRouter } from "vue-router";
+import { userState } from "@/state/userState";
+
+const router = useRouter();
+</script>
+
 <template>
   <nav class="navbar">
     <h1 @click="$router.push('/')">SmartCal</h1>
     <ul class="nav-links">
-      <!-- <li><a @click="$router.push('/')">Home</a></li> -->
       <li><a href="#">Home</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#contact">Contact</a></li>
       <li>
-        <button class="login-btn" @click="$router.push('/login')">Login</button>
+        <button
+          class="login-btn"
+          @click="
+            userState.loggedIn ? router.push('/profile') : router.push('/login')
+          "
+        >
+          {{ userState.loggedIn ? "Profile" : "Login" }}
+        </button>
       </li>
     </ul>
   </nav>

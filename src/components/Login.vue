@@ -16,6 +16,7 @@
             type="email"
             id="email"
             placeholder="you@example.com"
+            v-model="email"
             required
           />
         </div>
@@ -26,6 +27,7 @@
             type="password"
             id="password"
             placeholder="Enter your password"
+            v-model="password"
             required
           />
         </div>
@@ -42,9 +44,23 @@
 </template>
 
 <script setup>
-import backArrow from "@/assets/back-arrow.png"; // import the image
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import backArrow from "@/assets/back-arrow.png";
+import { userState } from "@/state/userState";
+
+const router = useRouter();
+const email = ref("");
+const password = ref("");
+
 const login = () => {
-  alert("This is a demo login. You can now proceed to the next page!");
+  if (email.value === "wad2@gmail.com" && password.value === "wad2grp2") {
+    alert("Login successful!");
+    userState.loggedIn = true; // Update navbar state
+    router.push("/"); // Redirect to home
+  } else {
+    alert("Invalid credentials");
+  }
 };
 </script>
 
@@ -61,7 +77,6 @@ const login = () => {
   margin: 5rem auto;
 }
 
-/* BACK BUTTON INSIDE CARD */
 .back-button {
   position: absolute;
   top: 15px;
