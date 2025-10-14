@@ -10,23 +10,14 @@
     <section class="log-entry">
       <h2>Log Your Food</h2>
       <div class="input-group">
-        <input
-          type="text"
-          placeholder="Search for food or enter custom item..."
-          v-model="newFoodName"
-        />
+        <input type="text" placeholder="Search for food or enter custom item..." v-model="newFoodName" />
         <button @click="addFood">Add</button>
       </div>
     </section>
 
     <!-- FOOD CARDS -->
     <section class="food-cards">
-      <div
-        class="food-card"
-        v-for="item in foods"
-        :key="item.name"
-        @click="showChart(item)"
-      >
+      <div class="food-card" v-for="item in foods" :key="item.name" @click="showChart(item)">
         <h3>{{ item.name }}</h3>
         <p>Calories: {{ item.calories }} kcal</p>
         <p>Protein: {{ item.protein }} g</p>
@@ -45,6 +36,21 @@
       </section>
     </transition>
 
+    <!-- WEEKLY RECOMMENDATION -->
+    <section class="recommendation-section">
+      <h2>Weekly Recommendation</h2>
+      <div class="rec-controls">
+        <button @click="getRecommendation" :disabled="loading">
+          {{ loading ? 'Analyzing...' : 'Get Weekly Recommendation' }}
+        </button>
+        <button @click="clearRecommendation">Clear</button>
+      </div>
+      <div class="rec-output" v-if="recommendation || error">
+        <p v-if="recommendation">{{ recommendation }}</p>
+        <p v-if="error" style="color: red">{{ error }}</p>
+      </div>
+    </section>
+
     <!-- FOOTER -->
     <footer class="log-footer">
       <button @click="$router.push('/')">Back to Home</button>
@@ -54,6 +60,7 @@
 
 <script setup>
 import { ref, nextTick } from "vue";
+import { GoogleGenAI } from "@google/genai";
 import { Chart, PieController, ArcElement, Tooltip, Legend } from "chart.js";
 import "../assets/logPage.css"; // import the CSS file
 
@@ -66,6 +73,9 @@ const foods = ref([
 
 const newFoodName = ref("");
 const selectedFood = ref(null);
+const loading = ref(false);
+const error = ref(null);
+const recommendation = ref(null);
 let macroChart = null;
 
 const addFood = () => {
@@ -114,5 +124,37 @@ const showChart = async (food) => {
       plugins: { legend: { position: "bottom" } },
     },
   });
+};
+
+
+const getRecommendation = async () => {
+  loading.value = true;
+  error.value = null;
+  recommendation.value = null;
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+  const prompt = `User ate these items this week: ${JSON.stringify(foods.value)}.
+Give a short plain-text recommendation: what to eat more/less and any macro focus (1-2 sentences).`;
+
+  
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+    console.log(response.text);
+    recommendation.value = response.text;
+  } catch (err) {
+    error.value = err.message || "Failed to get recommendation";
+  } finally {
+    loading.value = false;
+  }
+};
+
+const clearRecommendation = () => {
+  recommendation.value = null;
+  error.value = null;
 };
 </script>
