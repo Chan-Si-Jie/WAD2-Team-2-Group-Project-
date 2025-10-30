@@ -1,10 +1,17 @@
 <template>
   <div class="profile-page">
-    <div class="profile-container">
-      <h2>Welcome to your Profile!</h2>
-      <p>Email: <strong>wad2@gmail.com</strong></p>
+    <div class="profile-container" v-if="userState.loggedIn">
+      <h2>Welcome, {{ userState.user.user_metadata.full_name || "User" }}!</h2>
+      <p>
+        Email: <strong>{{ userState.user.email }}</strong>
+      </p>
 
       <button class="logout-btn" @click="logout">Logout</button>
+    </div>
+
+    <div v-else class="not-logged-in">
+      <p>You are not logged in.</p>
+      <button @click="router.push('/login')">Go to Login</button>
     </div>
   </div>
 </template>
@@ -12,12 +19,16 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { userState } from "@/state/userState";
+import { supabase } from "@/supabase";
 
 const router = useRouter();
 
-const logout = () => {
-  userState.loggedIn = false; // Reset login state
-  router.push("/");
+// Logout function
+const logout = async () => {
+  await supabase.auth.signOut(); // Log out from Supabase
+  userState.loggedIn = false; // Reset reactive state
+  userState.user = null;
+  router.push("/"); // Redirect to login
 };
 </script>
 
@@ -46,6 +57,25 @@ const logout = () => {
 }
 
 .logout-btn:hover {
+  background-color: #0056b3;
+}
+
+.not-logged-in {
+  text-align: center;
+  margin-top: 5rem;
+}
+
+.not-logged-in button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.2rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.not-logged-in button:hover {
   background-color: #0056b3;
 }
 </style>

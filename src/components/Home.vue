@@ -9,10 +9,10 @@
         <div class="hero-text">
           <h1>Track Your Calories Effortlessly</h1>
           <p>
-            SmartCal helps you log meals, track nutrition, and reach your health goals — 
-            all through a simple, fun, and visual experience.
+            SmartCal helps you log meals, track nutrition, and reach your health
+            goals — all through a simple, fun, and visual experience.
           </p>
-          <button @click="$router.push('/log')" class="cta-btn">Get Started</button>
+          <button @click="handleGetStarted" class="cta-btn">Get Started</button>
         </div>
         <div class="hero-img">
           <img
@@ -29,27 +29,51 @@
       <h2>Features</h2>
       <div class="feature-grid">
         <div class="card">
-          <img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" alt="Food logging" />
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png"
+            alt="Food logging"
+          />
           <h3>Easy Food Logging</h3>
-          <p>Log your meals in seconds using our vast food database or add your own recipes.</p>
+          <p>
+            Log your meals in seconds using our vast food database or add your
+            own recipes.
+          </p>
         </div>
 
         <div class="card">
-          <img src="https://cdn-icons-png.flaticon.com/512/1046/1046790.png" alt="Progress" />
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1046/1046790.png"
+            alt="Progress"
+          />
           <h3>Visual Progress</h3>
-          <p>Track weekly calorie and macro trends with clean, easy-to-read charts.</p>
+          <p>
+            Track weekly calorie and macro trends with clean, easy-to-read
+            charts.
+          </p>
         </div>
 
         <div class="card">
-          <img src="https://cdn-icons-png.flaticon.com/512/1046/1046786.png" alt="Goal setting" />
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1046/1046786.png"
+            alt="Goal setting"
+          />
           <h3>Goal Setting</h3>
-          <p>Stay motivated with personalized calorie and nutrition goals tailored for you.</p>
+          <p>
+            Stay motivated with personalized calorie and nutrition goals
+            tailored for you.
+          </p>
         </div>
 
         <div class="card">
-          <img src="https://cdn-icons-png.flaticon.com/512/1046/1046796.png" alt="Secure accounts" />
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1046/1046796.png"
+            alt="Secure accounts"
+          />
           <h3>Secure Accounts</h3>
-          <p>Your progress and logs are stored securely and accessible anytime, anywhere.</p>
+          <p>
+            Your progress and logs are stored securely and accessible anytime,
+            anywhere.
+          </p>
         </div>
       </div>
     </section>
@@ -59,12 +83,14 @@
       <div class="container">
         <h2>About</h2>
         <p>
-          <strong>SmartCal</strong> is an intuitive calorie tracking app developed by a passionate team of students
-          from <strong>SMU</strong> as part of our Web Application Development course.
-          Our mission is to empower individuals to live healthier lives by making nutrition tracking
-          <em>simple, fun, and visually engaging</em>.
-          (And yes, we wouldn’t mind scoring well for this project too 😄)
-          We hope you enjoy using <strong>SmartCal</strong> as much as we enjoyed building it!
+          <strong>SmartCal</strong> is an intuitive calorie tracking app
+          developed by a passionate team of students from
+          <strong>SMU</strong> as part of our Web Application Development
+          course. Our mission is to empower individuals to live healthier lives
+          by making nutrition tracking
+          <em>simple, fun, and visually engaging</em>. (And yes, we wouldn’t
+          mind scoring well for this project too 😄) We hope you enjoy using
+          <strong>SmartCal</strong> as much as we enjoyed building it!
         </p>
       </div>
     </section>
@@ -78,22 +104,42 @@
           Reach out through any of the channels below:
         </p>
         <ul class="contact-list">
-          <li><i class="fas fa-envelope"></i> <a href="mailto:hello@smartcal.com">hello@smartcal.com</a></li>
-          <li><i class="fas fa-phone"></i> <a href="tel:+6598888999">+65 9888 8999</a></li>
-          <li><i class="fas fa-map-marker-alt"></i> 80 Stamford Rd, Singapore 178902</li>
+          <li>
+            <i class="fas fa-envelope"></i>
+            <a href="mailto:hello@smartcal.com">hello@smartcal.com</a>
+          </li>
+          <li>
+            <i class="fas fa-phone"></i>
+            <a href="tel:+6598888999">+65 9888 8999</a>
+          </li>
+          <li>
+            <i class="fas fa-map-marker-alt"></i> 80 Stamford Rd, Singapore
+            178902
+          </li>
         </ul>
       </div>
     </section>
 
     <!-- FOOTER -->
-    <footer>
-      &copy; 2025 SmartCal. All rights reserved.
-    </footer>
+    <footer>&copy; 2025 SmartCal. All rights reserved.</footer>
   </div>
 </template>
 
 <script setup>
 import Navbar from "../components/Navbar.vue";
+import { userState } from "@/state/userState";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const handleGetStarted = () => {
+  if (userState.loggedIn) {
+    router.push("/log"); // go to dashboard if logged in
+  } else {
+    router.push("/login"); // redirect to login
+    alert("Please login first to access the dashboard!");
+  }
+};
 </script>
 
 <style>
@@ -164,8 +210,13 @@ body {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 /* FEATURES SECTION */
@@ -195,12 +246,12 @@ body {
   padding: 30px 20px;
   text-align: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
 }
 
 .card img {

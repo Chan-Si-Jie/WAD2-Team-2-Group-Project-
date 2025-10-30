@@ -1,7 +1,7 @@
 <template>
-  <div class="register-page">
-    <div class="register-container">
-      <!-- BACK BUTTON INSIDE CARD -->
+  <div class="auth-page">
+    <div class="auth-container">
+      <!-- BACK BUTTON -->
       <div class="back-button" @click="$router.push('/login')">
         <img :src="backArrow" alt="Back" />
       </div>
@@ -56,22 +56,57 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import backArrow from "@/assets/back-arrow.png";
+import { supabase } from "@/supabase";
 
+const router = useRouter();
 const name = ref("");
 const email = ref("");
 const password = ref("");
 
-const register = () => {
-  alert(`Welcome ${name.value}! Your account has been created.`);
-  // In production: call backend API for signup
+const register = async () => {
+  if (!name.value || !email.value || !password.value) {
+    alert("All fields are required!");
+    return;
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email: email.value,
+    password: password.value,
+    options: { data: { full_name: name.value } },
+  });
+
+  if (error) {
+    if (
+      error.message.includes("already registered") ||
+      error.message.includes("User already exists")
+    ) {
+      alert(
+        "This email is already registered or pending confirmation. Please login or confirm your email."
+      );
+    } else {
+      alert(`Registration failed: ${error.message}`);
+    }
+    return;
+  }
+
+  if (data?.user) {
+    alert(
+      "Signup successful! Please check your email to confirm your account before logging in."
+    );
+    router.push("/login");
+  } else {
+    // This case happens when the email is already pending confirmation
+    alert(
+      "This email is already registered or pending confirmation. Please login or confirm your email."
+    );
+  }
 };
 </script>
 
-<style src="../assets/index.css"></style>
-
 <style scoped>
-.register-page {
+.auth-page {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   min-height: 100vh;
   display: flex;
@@ -79,30 +114,65 @@ const register = () => {
   align-items: center;
 }
 
-.register-container {
+.auth-container {
   position: relative;
+  width: 400px;
+  max-width: 90%;
   padding: 2rem;
   border-radius: 15px;
   background-color: #ffffff;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  max-width: 400px;
-  width: 90%;
 }
 
 .back-button {
   position: absolute;
   top: 15px;
   left: 15px;
+  width: 30px;
+  height: 30px;
   cursor: pointer;
 }
 
 .back-button img {
-  width: 25px;
-  height: 25px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   transition: transform 0.3s ease;
 }
 
 .back-button:hover img {
   transform: translateX(-3px);
+}
+
+.input-group {
+  margin: 1rem 0;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 0.6rem;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+button:hover {
+  background-color: #20c997;
+}
+
+.signup-text {
+  margin-top: 1rem;
+  text-align: center;
 }
 </style>

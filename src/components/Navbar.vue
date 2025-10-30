@@ -2,12 +2,21 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { userState } from "@/state/userState";
+import { supabase } from "@/supabase";
 
 const router = useRouter();
 const mobileMenu = ref(false);
 
 const toggleMenu = () => {
   mobileMenu.value = !mobileMenu.value;
+};
+
+// Logout function
+const logout = async () => {
+  await supabase.auth.signOut();
+  userState.loggedIn = false;
+  userState.user = null;
+  router.push("/");
 };
 </script>
 
@@ -28,15 +37,19 @@ const toggleMenu = () => {
         <li><a href="#features">Features</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#contact">Contact</a></li>
-        <li>
-          <button
-            class="login-btn"
-            @click="
-              userState.loggedIn ? router.push('/profile') : router.push('/login')
-            "
-          >
-            {{ userState.loggedIn ? 'Profile' : 'Login' }}
+
+        <!-- Dynamic Login/Profile -->
+        <li v-if="!userState.loggedIn">
+          <button class="login-btn" @click="router.push('/login')">
+            Login
           </button>
+        </li>
+
+        <li v-else class="profile-container">
+          <button class="login-btn" @click="router.push('/profile')">
+            Profile
+          </button>
+          <button class="login-btn logout-btn" @click="logout">Logout</button>
         </li>
       </ul>
     </div>
@@ -80,7 +93,7 @@ const toggleMenu = () => {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
   transition: all 0.3s ease;
 }
 
@@ -105,7 +118,7 @@ const toggleMenu = () => {
   width: 100%;
 }
 
-/* LOGIN BUTTON */
+/* LOGIN / PROFILE / LOGOUT BUTTONS */
 .login-btn {
   background-color: white;
   color: #27ae60;
@@ -115,11 +128,18 @@ const toggleMenu = () => {
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
+  margin-left: 0.5rem;
 }
 
 .login-btn:hover {
   background-color: #f0f9ff;
   transform: translateY(-2px);
+}
+
+.profile-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* HAMBURGER MENU */
@@ -165,6 +185,10 @@ const toggleMenu = () => {
   .login-btn {
     width: 80%;
     margin-top: 0.5rem;
+  }
+
+  .profile-container {
+    flex-direction: column;
   }
 }
 </style>
