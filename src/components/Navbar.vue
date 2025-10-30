@@ -23,35 +23,36 @@ const logout = async () => {
 <template>
   <nav class="navbar">
     <div class="nav-container">
-      <!-- Logo -->
+      <!-- LEFT: Logo -->
       <h1 class="logo" @click="$router.push('/')">SmartCal</h1>
 
-      <!-- Hamburger Menu (Mobile) -->
-      <div class="menu-toggle" @click="toggleMenu">
-        <i :class="mobileMenu ? 'fas fa-times' : 'fas fa-bars'"></i>
+      <!-- CENTER: flexible spacer -->
+      <div class="nav-center"></div>
+
+      <!-- RIGHT: nav links + buttons -->
+      <div class="nav-right">
+        <!-- Hamburger Menu (Mobile) -->
+        <div class="menu-toggle" @click="toggleMenu">
+          <i :class="mobileMenu ? 'fas fa-times' : 'fas fa-bars'"></i>
+        </div>
+
+        <!-- Navigation Links -->
+        <ul :class="['nav-links', { active: mobileMenu }]">
+          <li><a href="#">Home</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+
+          <!-- Dynamic Login/Profile -->
+          <li v-if="!userState.loggedIn">
+            <button class="login-btn" @click="router.push('/login')">Login</button>
+          </li>
+          <li v-else class="profile-container">
+            <button class="login-btn" @click="router.push('/profile')">Profile</button>
+            <button class="login-btn logout-btn" @click="logout">Logout</button>
+          </li>
+        </ul>
       </div>
-
-      <!-- Navigation Links -->
-      <ul :class="['nav-links', { active: mobileMenu }]">
-        <li><a href="#">Home</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#contact">Contact</a></li>
-
-        <!-- Dynamic Login/Profile -->
-        <li v-if="!userState.loggedIn">
-          <button class="login-btn" @click="router.push('/login')">
-            Login
-          </button>
-        </li>
-
-        <li v-else class="profile-container">
-          <button class="login-btn" @click="router.push('/profile')">
-            Profile
-          </button>
-          <button class="login-btn logout-btn" @click="logout">Logout</button>
-        </li>
-      </ul>
     </div>
   </nav>
 </template>
@@ -72,15 +73,15 @@ const logout = async () => {
 
 .nav-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: flex-start; /* logo left, spacer pushes nav-right */
   padding: 0.8rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
   font-family: "Poppins", sans-serif;
 }
 
-/* LOGO */
+/* Logo */
 .logo {
   font-size: 1.6rem;
   font-weight: 700;
@@ -88,12 +89,23 @@ const logout = async () => {
   cursor: pointer;
 }
 
-/* NAV LINKS */
-.nav-links {
-  list-style: none;
+/* Spacer to push nav-right to the far right */
+.nav-center {
+  flex: 1;
+}
+
+/* Right-side nav */
+.nav-right {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+/* Nav links */
+.nav-links {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
   transition: all 0.3s ease;
 }
 
@@ -118,7 +130,7 @@ const logout = async () => {
   width: 100%;
 }
 
-/* LOGIN / PROFILE / LOGOUT BUTTONS */
+/* Buttons */
 .login-btn {
   background-color: white;
   color: #27ae60;
@@ -128,7 +140,6 @@ const logout = async () => {
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
-  margin-left: 0.5rem;
 }
 
 .login-btn:hover {
@@ -142,7 +153,7 @@ const logout = async () => {
   gap: 0.5rem;
 }
 
-/* HAMBURGER MENU */
+/* Hamburger Menu */
 .menu-toggle {
   display: none;
   cursor: pointer;
@@ -169,6 +180,7 @@ const logout = async () => {
     transform: translateY(-20px);
     pointer-events: none;
     transition: all 0.3s ease;
+    z-index: 999;
   }
 
   .nav-links.active {
