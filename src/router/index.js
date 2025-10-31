@@ -5,6 +5,7 @@ import Register from "../components/Register.vue";
 import Profile from "../components/Profile.vue";
 import Log from "../components/SmartCal.vue"; // Dashboard
 import { userState } from "@/state/userState";
+import Dashboard from "@/components/Dashboard.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
@@ -12,6 +13,12 @@ const routes = [
   { path: "/register", name: "Register", component: Register },
   { path: "/profile", name: "Profile", component: Profile },
   { path: "/log", name: "Log", component: Log, meta: { requiresAuth: true } },
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    component: Dashboard,
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({

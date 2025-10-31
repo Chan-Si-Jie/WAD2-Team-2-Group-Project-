@@ -1,35 +1,76 @@
 <template>
-  <div class="home-page"> <!-- NAVBAR -->
-    <Navbar /> <!-- HERO SECTION -->
+  <div class="home-page">
+    <!-- NAVBAR -->
+    <Navbar />
+    <!-- HERO SECTION -->
     <section class="hero">
       <div class="hero-content">
         <div class="hero-text">
           <h1>Track Your Calories Effortlessly</h1>
-          <p> SmartCal helps you log meals, track nutrition, and reach your health goals — all through a simple, fun,
-            and visual experience. </p> <button @click="$router.push('/log')" class="cta-btn">Get Started</button>
+          <p>
+            SmartCal helps you log meals, track nutrition, and reach your health
+            goals — all through a simple, fun, and visual experience.
+          </p>
+          <button @click="$router.push('/dashboard')" class="cta-btn">
+            Get Started
+          </button>
         </div>
-        <div class="hero-img"> <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Healthy food"
-            class="hero-image" /> </div>
+        <div class="hero-img">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png"
+            alt="Healthy food"
+            class="hero-image"
+          />
+        </div>
       </div>
-    </section> <!-- FEATURES SECTION -->
+    </section>
+    <!-- FEATURES SECTION -->
     <section class="features" id="features">
       <h2>Features</h2>
       <div class="feature-grid">
-        <div class="card"> <img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" alt="Food logging" />
+        <div class="card">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png"
+            alt="Food logging"
+          />
           <h3>Easy Food Logging</h3>
-          <p>Log your meals in seconds using our vast food database or add your own recipes.</p>
+          <p>
+            Log your meals in seconds using our vast food database or add your
+            own recipes.
+          </p>
         </div>
-        <div class="card"> <img src="https://cdn-icons-png.flaticon.com/512/1046/1046790.png" alt="Progress" />
+        <div class="card">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1046/1046790.png"
+            alt="Progress"
+          />
           <h3>Visual Progress</h3>
-          <p>Track weekly calorie and macro trends with clean, easy-to-read charts.</p>
+          <p>
+            Track weekly calorie and macro trends with clean, easy-to-read
+            charts.
+          </p>
         </div>
-        <div class="card"> <img src="https://cdn-icons-png.flaticon.com/512/1046/1046786.png" alt="Goal setting" />
+        <div class="card">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1046/1046786.png"
+            alt="Goal setting"
+          />
           <h3>Goal Setting</h3>
-          <p>Stay motivated with personalized calorie and nutrition goals tailored for you.</p>
+          <p>
+            Stay motivated with personalized calorie and nutrition goals
+            tailored for you.
+          </p>
         </div>
-        <div class="card"> <img src="https://cdn-icons-png.flaticon.com/512/1046/1046796.png" alt="Secure accounts" />
+        <div class="card">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1046/1046796.png"
+            alt="Secure accounts"
+          />
           <h3>Secure Accounts</h3>
-          <p>Your progress and logs are stored securely and accessible anytime, anywhere.</p>
+          <p>
+            Your progress and logs are stored securely and accessible anytime,
+            anywhere.
+          </p>
         </div>
       </div>
     </section>
@@ -39,15 +80,19 @@
         <div class="about-text">
           <h2>About</h2>
           <p>
-            <strong>SmartCal</strong> is your personal calorie tracker that makes healthy eating simple.
-            Log meals, monitor your daily calorie intake, and get <strong>AI-powered recommendations</strong> to reach
-            your nutrition goals. With clear insights into your eating habits, SmartCal helps you make smarter choices
-            and stay on
+            <strong>SmartCal</strong> is your personal calorie tracker that
+            makes healthy eating simple. Log meals, monitor your daily calorie
+            intake, and get <strong>AI-powered recommendations</strong> to reach
+            your nutrition goals. With clear insights into your eating habits,
+            SmartCal helps you make smarter choices and stay on
             track—effortlessly.
           </p>
         </div>
         <div class="about-image">
-          <img src="https://cdn-icons-png.flaticon.com/512/2316/2316949.png" alt="Healthy eating illustration">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/2316/2316949.png"
+            alt="Healthy eating illustration"
+          />
         </div>
       </div>
     </section>
@@ -57,7 +102,8 @@
         <h2>Contact Us</h2>
         <p>
           Have questions, feedback, or need support? We'd love to hear from you!
-          Reach out through any of the channels below or send us a message directly.
+          Reach out through any of the channels below or send us a message
+          directly.
         </p>
 
         <div class="contact-grid">
@@ -76,7 +122,6 @@
               </div>
             </div>
             <div class="info-card">
-
               <div>
                 <h4>Address</h4>
                 80 Stamford Rd, Singapore 178902
@@ -97,14 +142,17 @@
       </div>
     </section>
 
-
     <!-- FOOTER -->
     <footer>
-      <div class="footer-bottom"> &copy; 2025 SmartCal. All rights reserved. </div>
+      <div class="footer-bottom">
+        &copy; 2025 SmartCal. All rights reserved.
+      </div>
     </footer>
   </div>
 </template>
-<script setup>import Navbar from "../components/Navbar.vue"; </script>
+<script setup>
+import Navbar from "../components/Navbar.vue";
+</script>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
@@ -190,7 +238,6 @@ body {
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0);
@@ -229,7 +276,7 @@ body {
   border-radius: 16px;
   padding: 30px 20px;
   text-align: center;
-  transition: transform 0.28s cubic-bezier(.2, .9, .3, 1), box-shadow 0.28s;
+  transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.28s;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
   color: #fff;
 }
@@ -315,13 +362,18 @@ body {
   max-width: 100%;
   height: auto;
   border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   animation: float 4s ease-in-out infinite;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 /* Responsive */
@@ -390,8 +442,6 @@ body {
 .info-card:hover {
   transform: translateY(-5px);
 }
-
-
 
 .info-card h4 {
   margin: 0;
@@ -501,7 +551,6 @@ body {
   text-decoration: underline;
 }
 
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .contact-grid {
@@ -510,13 +559,12 @@ body {
   }
 }
 
-
 /* FOOTER */
 footer {
   background: linear-gradient(135deg, #27ae60, #20c997);
   color: white;
   width: 100%;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 /* RESPONSIVE */

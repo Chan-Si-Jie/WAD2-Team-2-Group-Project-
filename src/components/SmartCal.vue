@@ -10,14 +10,23 @@
     <section class="log-entry">
       <h2>Log Your Food</h2>
       <div class="input-group">
-        <input type="text" placeholder="Search for food or enter custom item..." v-model="newFoodName" />
+        <input
+          type="text"
+          placeholder="Search for food or enter custom item..."
+          v-model="newFoodName"
+        />
         <button @click="addFood">Add</button>
       </div>
     </section>
 
     <!-- FOOD CARDS -->
     <section class="food-cards">
-      <div class="food-card" v-for="item in foods" :key="item.name" @click="showChart(item)">
+      <div
+        class="food-card"
+        v-for="item in foods"
+        :key="item.name"
+        @click="showChart(item)"
+      >
         <h3>{{ item.name }}</h3>
         <p>Calories: {{ item.calories }} kcal</p>
         <p>Protein: {{ item.protein }} g</p>
@@ -41,7 +50,7 @@
       <h2>Weekly Recommendation</h2>
       <div class="rec-controls">
         <button @click="getRecommendation" :disabled="loading">
-          {{ loading ? 'Analyzing...' : 'Get Weekly Recommendation' }}
+          {{ loading ? "Analyzing..." : "Get Weekly Recommendation" }}
         </button>
         <button @click="clearRecommendation">Clear</button>
       </div>
@@ -126,7 +135,6 @@ const showChart = async (food) => {
   });
 };
 
-
 const getRecommendation = async () => {
   loading.value = true;
   error.value = null;
@@ -135,10 +143,11 @@ const getRecommendation = async () => {
 
   const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
-  const prompt = `User ate these items this week: ${JSON.stringify(foods.value)}.
+  const prompt = `User ate these items this week: ${JSON.stringify(
+    foods.value
+  )}.
 Give a short plain-text recommendation: what to eat more/less and any macro focus (1-2 sentences).`;
 
-  
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
