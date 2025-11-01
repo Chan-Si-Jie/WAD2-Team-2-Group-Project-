@@ -90,6 +90,27 @@
         :fat="totalFat"
       />
     </section>
+
+    <!-- AI Recommendations -->
+    <section class="recommendations-section">
+      <h2>AI Nutrition Recommendations</h2>
+      <p class="recommendations-subtitle">Get personalized advice based on your daily intake</p>
+      <div class="rec-controls">
+        <button @click="getRecommendation" :disabled="loading || !dataFetched">
+          {{ loading ? "Analyzing..." : "Get Daily Recommendation" }}
+        </button>
+        <button @click="clearRecommendation" v-if="recommendation || error">
+          Clear
+        </button>
+      </div>
+      <div class="rec-output" v-if="recommendation || error">
+        <div v-if="recommendation" class="recommendation-text">
+          <strong>💡 Recommendation:</strong>
+          <p>{{ recommendation }}</p>
+        </div>
+        <p v-if="error" class="error-text">{{ error }}</p>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -109,6 +130,14 @@ const totalCarbs = ref(0);
 const totalProtein = ref(0);
 const totalFat = ref(0);
 const dataFetched = ref(false);
+
+// AI Recommendations
+const recommendation = ref(null);
+const loading = ref(false);
+const error = ref(null);
+
+// Backend API URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Form visibility
 const showMealForm = ref(false);
@@ -208,6 +237,77 @@ async function addNutrition() {
   fetchData();
 }
 
+// AI Recommendation
+async function getRecommendation() {
+  loading.value = true;
+  error.value = null;
+  recommendation.value = null;
+
+  const today = getToday();
+
+  try {
+    // Fetch all data from today for more detailed recommendations
+    const [mealsRes, waterRes, nutritionRes] = await Promise.all([
+      supabase
+        .from("meals")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("date", today),
+      supabase
+        .from("water_logs")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("date", today),
+      supabase
+        .from("nutrition")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("date", today),
+    ]);
+
+    const summary = {
+      totals: {
+        calories: totalCalories.value,
+        water: totalWater.value,
+        carbs: totalCarbs.value,
+        protein: totalProtein.value,
+        fat: totalFat.value,
+      },
+      meals: mealsRes.data || [],
+      waterLogs: waterRes.data || [],
+      nutritionEntries: nutritionRes.data || [],
+    };
+
+    const response = await fetch(`${API_URL}/api/recommendation`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ summary }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to get recommendation");
+    }
+
+    const data = await response.json();
+    recommendation.value = data.recommendation;
+  } catch (err) {
+    console.error("Recommendation error:", err);
+    error.value =
+      err.message ||
+      "Failed to get recommendation. Make sure the server is running.";
+  } finally {
+    loading.value = false;
+  }
+}
+
+function clearRecommendation() {
+  recommendation.value = null;
+  error.value = null;
+}
+
 // Fetch data on mount
 onMounted(fetchData);
 </script>
@@ -298,5 +398,95 @@ onMounted(fetchData);
 }
 .breakdown div {
   margin: 0.5rem 0;
+}
+
+/* AI Recommendations Section */
+.recommendations-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.recommendations-section h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.recommendations-subtitle {
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.rec-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.rec-controls button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.rec-controls button:first-child {
+  background: white;
+  color: #667eea;
+}
+
+.rec-controls button:first-child:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.rec-controls button:first-child:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rec-controls button:last-child {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.rec-controls button:last-child:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.rec-output {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 15px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.recommendation-text {
+  text-align: left;
+}
+
+.recommendation-text strong {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.recommendation-text p {
+  line-height: 1.6;
+  opacity: 0.95;
+}
+
+.error-text {
+  color: #ffdddd;
+  margin: 0;
 }
 </style>
