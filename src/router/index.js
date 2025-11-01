@@ -3,7 +3,7 @@ import Home from "../components/Home.vue";
 import Login from "../components/Login.vue";
 import Register from "../components/Register.vue";
 import Profile from "../components/Profile.vue";
-import Log from "../components/SmartCal.vue"; // Dashboard
+// import Log from "../components/SmartCal.vue"; // Dashboard
 import { userState } from "@/state/userState";
 import Dashboard from "@/components/Dashboard.vue";
 
@@ -12,7 +12,7 @@ const routes = [
   { path: "/login", name: "Login", component: Login },
   { path: "/register", name: "Register", component: Register },
   { path: "/profile", name: "Profile", component: Profile },
-  { path: "/log", name: "Log", component: Log, meta: { requiresAuth: true } },
+  // { path: "/log", name: "Log", component: Log, meta: { requiresAuth: true } },
   {
     path: "/dashboard",
     name: "Dashboard",
