@@ -1,4 +1,7 @@
 <template>
+  <div class="back-button" @click="goHome">
+    <img :src="backArrow" alt="Back" />
+  </div>
   <div class="dashboard">
     <header class="dashboard-header">
       <h1>Welcome, {{ user?.email }}</h1>
@@ -94,7 +97,9 @@
     <!-- AI Recommendations -->
     <section class="recommendations-section">
       <h2>AI Nutrition Recommendations</h2>
-      <p class="recommendations-subtitle">Get personalized advice based on your daily intake</p>
+      <p class="recommendations-subtitle">
+        Get personalized advice based on your daily intake
+      </p>
       <div class="rec-controls">
         <button @click="getRecommendation" :disabled="loading || !dataFetched">
           {{ loading ? "Analyzing..." : "Get Daily Recommendation" }}
@@ -115,10 +120,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, watchEffect, onMounted } from "vue";
 import { supabase } from "@/supabase";
 import { userState } from "@/state/userState";
 import NutritionPieChart from "@/components/NutritionPieChart.vue";
+import { useRouter } from "vue-router";
+import backArrow from "@/assets/back-arrow.png";
+
+const router = useRouter();
+
+const goHome = () => {
+  router.push("/");
+};
 
 // User
 const user = userState.user;
@@ -137,7 +150,7 @@ const loading = ref(false);
 const error = ref(null);
 
 // Backend API URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 // Form visibility
 const showMealForm = ref(false);
@@ -164,13 +177,15 @@ async function fetchData() {
 
   const today = getToday();
 
+  // Fetch meals
   const { data: meals } = await supabase
     .from("meals")
     .select("*")
     .eq("user_id", user.id)
     .gte("date", today);
-  totalCalories.value = meals?.reduce((sum, m) => sum + m.calories, 0) || 0;
+  const mealCalories = meals?.reduce((sum, m) => sum + m.calories, 0) || 0;
 
+  // Fetch water
   const { data: water } = await supabase
     .from("water_logs")
     .select("*")
@@ -178,14 +193,20 @@ async function fetchData() {
     .gte("date", today);
   totalWater.value = water?.reduce((sum, w) => sum + w.amount, 0) || 0;
 
+  // Fetch nutrition
   const { data: nutrition } = await supabase
     .from("nutrition")
     .select("*")
     .eq("user_id", user.id)
     .gte("date", today);
+  const nutritionCalories =
+    nutrition?.reduce((sum, n) => sum + n.calories, 0) || 0;
   totalCarbs.value = nutrition?.reduce((sum, n) => sum + n.carbs, 0) || 0;
   totalProtein.value = nutrition?.reduce((sum, n) => sum + n.protein, 0) || 0;
   totalFat.value = nutrition?.reduce((sum, n) => sum + n.fat, 0) || 0;
+
+  // Total calories = meals + nutrition
+  totalCalories.value = mealCalories + nutritionCalories;
 
   dataFetched.value = true;
 }
@@ -309,10 +330,35 @@ function clearRecommendation() {
 }
 
 // Fetch data on mount
-onMounted(fetchData);
+watchEffect(() => {
+  if (user) {
+    fetchData();
+  }
+});
 </script>
 
 <style scoped>
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 40px; /* bigger than login */
+  height: 40px;
+  cursor: pointer;
+  z-index: 100;
+}
+
+.back-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.back-button:hover img {
+  transform: translateX(-5px);
+}
+
 .dashboard {
   max-width: 900px;
   margin: auto;

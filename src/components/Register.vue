@@ -22,6 +22,17 @@
         </div>
 
         <div class="input-group">
+          <label for="phone">Phone Number</label>
+          <input
+            type="tel"
+            id="phone"
+            placeholder="+65 9123 4567"
+            v-model="phone"
+            required
+          />
+        </div>
+
+        <div class="input-group">
           <label for="email">Email</label>
           <input
             type="email"
@@ -64,9 +75,10 @@ const router = useRouter();
 const name = ref("");
 const email = ref("");
 const password = ref("");
+const phone = ref("");
 
 const register = async () => {
-  if (!name.value || !email.value || !password.value) {
+  if (!name.value || !email.value || !password.value || !phone.value) {
     alert("All fields are required!");
     return;
   }
@@ -74,7 +86,12 @@ const register = async () => {
   const { data, error } = await supabase.auth.signUp({
     email: email.value,
     password: password.value,
-    options: { data: { full_name: name.value } },
+    options: {
+      data: {
+        full_name: name.value,
+        phone: phone.value,
+      },
+    },
   });
 
   if (error) {
@@ -96,11 +113,6 @@ const register = async () => {
       "Signup successful! Please check your email to confirm your account before logging in."
     );
     router.push("/login");
-  } else {
-    // This case happens when the email is already pending confirmation
-    alert(
-      "This email is already registered or pending confirmation. Please login or confirm your email."
-    );
   }
 };
 </script>
@@ -113,12 +125,11 @@ const register = async () => {
   justify-content: center;
   align-items: center;
 }
-
 .auth-container {
   position: relative;
   width: 400px;
   max-width: 90%;
-  padding: 2rem;
+  padding: 3rem 2rem 2rem 2rem; /* increased top padding to 3rem */
   border-radius: 15px;
   background-color: #ffffff;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -132,29 +143,24 @@ const register = async () => {
   height: 30px;
   cursor: pointer;
 }
-
 .back-button img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
-
 .back-button:hover img {
   transform: translateX(-3px);
 }
-
 .input-group {
   margin: 1rem 0;
 }
-
 input {
   width: 100%;
   padding: 0.5rem;
   border-radius: 8px;
   border: 1px solid #ccc;
 }
-
 button {
   width: 100%;
   padding: 0.6rem;
@@ -166,11 +172,9 @@ button {
   cursor: pointer;
   margin-top: 1rem;
 }
-
 button:hover {
   background-color: #20c997;
 }
-
 .signup-text {
   margin-top: 1rem;
   text-align: center;
