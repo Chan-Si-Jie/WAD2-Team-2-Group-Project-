@@ -19,6 +19,11 @@ const routes = [
     component: Dashboard,
     meta: { requiresAuth: true },
   },
+  {
+    path: "/fitness",
+    name: "Fitness",
+    component: () => import("@/components/Fitness.vue"),
+  },
 ];
 
 const router = createRouter({

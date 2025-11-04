@@ -2,6 +2,7 @@
   <div class="home-page">
     <!-- NAVBAR -->
     <Navbar />
+
     <!-- HERO SECTION -->
     <section class="hero">
       <div class="hero-content">
@@ -11,9 +12,14 @@
             SmartCal helps you log meals, track nutrition, and reach your health
             goals — all through a simple, fun, and visual experience.
           </p>
-          <button @click="$router.push('/dashboard')" class="cta-btn">
-            Get Started
-          </button>
+          <div class="button-group">
+            <button @click="$router.push('/dashboard')" class="cta-btn">
+              Get Started
+            </button>
+            <button @click="$router.push('/fitness')" class="fitness-btn">
+              Go to Fitness Tracker
+            </button>
+          </div>
         </div>
         <div class="hero-img">
           <img
@@ -24,6 +30,7 @@
         </div>
       </div>
     </section>
+
     <!-- FEATURES SECTION -->
     <section class="features" id="features">
       <h2>Features</h2>
@@ -74,6 +81,7 @@
         </div>
       </div>
     </section>
+
     <!-- ABOUT SECTION -->
     <section class="about" id="about">
       <div class="about-container">
@@ -96,6 +104,7 @@
         </div>
       </div>
     </section>
+
     <!-- CONTACT SECTION -->
     <section class="contact" id="contact">
       <div class="container contact-container">
@@ -150,9 +159,11 @@
     </footer>
   </div>
 </template>
+
 <script setup>
 import Navbar from "../components/Navbar.vue";
 </script>
+
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
@@ -167,7 +178,6 @@ html,
 body {
   width: 100%;
   overflow-x: hidden;
-  /* prevent horizontal scroll */
   font-family: "Poppins", sans-serif;
   color: #2c3e50;
 }
@@ -208,6 +218,13 @@ body {
   line-height: 1.6;
 }
 
+.button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
 .cta-btn {
   background: #27ae60;
   color: white;
@@ -222,6 +239,23 @@ body {
 
 .cta-btn:hover {
   background: #1e874b;
+  transform: translateY(-3px);
+}
+
+.fitness-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fitness-btn:hover {
+  background: #0056b3;
   transform: translateY(-3px);
 }
 
@@ -366,29 +400,6 @@ body {
   animation: float 4s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .about-container {
-    flex-direction: column;
-    text-align: center;
-    gap: 30px;
-  }
-
-  .about-image img {
-    max-width: 80%;
-  }
-}
-
 /* CONTACT SECTION */
 .contact {
   background: #f9f9f9;
@@ -415,7 +426,6 @@ body {
   line-height: 1.6;
 }
 
-/* Grid layout */
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -426,17 +436,21 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  align-items: center;
 }
 
 .info-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 15px;
+  justify-content: center;
+  width: 500px;
   background: white;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease;
+  text-align: center;
 }
 
 .info-card:hover {
@@ -444,7 +458,7 @@ body {
 }
 
 .info-card h4 {
-  margin: 0;
+  margin-bottom: 6px;
   font-size: 1rem;
   font-weight: 600;
   color: #2c3e50;
@@ -459,154 +473,32 @@ body {
   text-decoration: underline;
 }
 
-/* Contact form */
-.contact-form form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-}
-
-.contact-form input,
-.contact-form textarea {
-  padding: 12px 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  resize: none;
-}
-
-.contact-form button {
-  padding: 12px 20px;
-  background: #27ae60;
-  color: white;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.contact-form button:hover {
-  background: #1e874b;
-  transform: translateY(-2px);
-}
-
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-  /* centers the cards horizontally */
-}
-
-.info-card {
-  display: flex;
-  flex-direction: column;
-  /* stack icon + text vertically */
-  align-items: center;
-  /* center the content inside the card */
-  justify-content: center;
-  /* vertical alignment if needed */
-  width: 500px;
-  /* fixed width */
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease;
-  text-align: center;
-  /* ensures text inside is centered */
-}
-
-.info-card i {
-  font-size: 1.5rem;
-  color: #27ae60;
-  width: 50px;
-  height: 50px;
-  background: #e0f7ea;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-  /* spacing between icon and text */
-}
-
-.info-card h4 {
-  margin-bottom: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.info-card a {
-  color: #27ae60;
-  text-decoration: none;
-}
-
-.info-card a:hover {
-  text-decoration: underline;
-}
-
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
+  .hero-content {
+    gap: 30px;
+  }
+
+  .about-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 30px;
+  }
+
+  .about-image img {
+    max-width: 80%;
+  }
+
   .contact-grid {
     grid-template-columns: 1fr;
     gap: 30px;
   }
 }
 
-/* FOOTER */
 footer {
   background: linear-gradient(135deg, #27ae60, #20c997);
   color: white;
-  width: 100%;
-  font-family: "Poppins", sans-serif;
-}
-
-/* RESPONSIVE */
-@media (min-width: 768px) {
-  .hero-content {
-    flex-direction: row;
-    text-align: left;
-    gap: 60px;
-  }
-
-  .hero-text {
-    flex: 1;
-  }
-
-  .hero-img {
-    flex: 1;
-  }
-
-  .contact-list {
-    flex-direction: row;
-    justify-content: center;
-    gap: 2.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-content {
-    gap: 30px;
-  }
-
-  .footer-container {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .footer-section {
-    flex: 1 1 100%;
-  }
-
-  .social-icons {
-    justify-content: center;
-  }
+  text-align: center;
+  padding: 20px;
 }
 </style>
