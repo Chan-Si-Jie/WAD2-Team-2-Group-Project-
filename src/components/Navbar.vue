@@ -71,16 +71,16 @@ const logout = async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* Adjusted so logo is permanently flush to the left edge */
 .nav-container {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* logo left, spacer pushes nav-right */
-  padding: 0.8rem 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  justify-content: space-between; /* logo left, nav-right right */
+  padding: 0.6rem 1rem; /* set left padding as you prefer; use 0 to be flush */
+  width: 100%;
+  margin: 0;
   font-family: "Poppins", sans-serif;
 }
-
 /* Logo */
 .logo {
   font-size: 1.6rem;
