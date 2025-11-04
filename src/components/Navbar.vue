@@ -98,11 +98,13 @@ const logout = async () => {
   font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
+  margin-right: 3rem;
 }
 
 /* Spacer to push nav-right to the far right */
 .nav-center {
   flex: 1;
+  min-width: 2rem;
 }
 
 /* Right-side nav */
@@ -115,7 +117,7 @@ const logout = async () => {
 /* Nav links */
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
   list-style: none;
   transition: all 0.3s ease;
 }
