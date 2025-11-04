@@ -99,7 +99,7 @@ Keep the response concise (3-4 sentences) and actionable.`;
     }
 
     // Get the generative model
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     // Generate content
     const result = await model.generateContent(prompt);
