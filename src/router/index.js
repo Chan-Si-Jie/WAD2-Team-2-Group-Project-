@@ -6,6 +6,7 @@ import Profile from "../components/Profile.vue";
 // import Log from "../components/SmartCal.vue"; // Dashboard
 import { userState } from "@/state/userState";
 import Dashboard from "@/components/Dashboard.vue";
+import MealPlanner from "@/components/MealPlanner.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
@@ -23,6 +24,12 @@ const routes = [
     path: "/fitness",
     name: "Fitness",
     component: () => import("@/components/Fitness.vue"),
+
+    path: "/meal-planner",
+    name: "MealPlanner",
+    component: MealPlanner,
+    meta: { requiresAuth: true },
+    f5c6fcb8b325c37b08da790a6cbaa936e0188f87,
   },
 ];
 

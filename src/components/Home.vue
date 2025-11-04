@@ -22,11 +22,7 @@
           </div>
         </div>
         <div class="hero-img">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png"
-            alt="Healthy food"
-            class="hero-image"
-          />
+          <AnimatedModel />
         </div>
       </div>
     </section>
@@ -162,6 +158,7 @@
 
 <script setup>
 import Navbar from "../components/Navbar.vue";
+import AnimatedModel from "../components/AnimatedModel.vue";
 </script>
 
 <style>

@@ -1,11 +1,15 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { userState } from "@/state/userState";
 import { supabase } from "@/supabase";
 
 const router = useRouter();
+const route = useRoute();
 const mobileMenu = ref(false);
+
+// Check if user is on homepage
+const isHomePage = computed(() => route.path === '/');
 
 const toggleMenu = () => {
   mobileMenu.value = !mobileMenu.value;
@@ -38,10 +42,17 @@ const logout = async () => {
 
         <!-- Navigation Links -->
         <ul :class="['nav-links', { active: mobileMenu }]">
-          <li><a href="#">Home</a></li>
-          <li><a href="#features">Features</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a @click.prevent="router.push(userState.loggedIn ? '/dashboard' : '/')">Home</a></li>
+          
+          <!-- Only show these on homepage -->
+          <li v-if="isHomePage"><a href="#features">Features</a></li>
+          <li v-if="isHomePage"><a href="#about">About</a></li>
+          <li v-if="isHomePage"><a href="#contact">Contact</a></li>
+
+          <!-- Meal Planner Link (only for logged in users) -->
+          <li v-if="userState.loggedIn">
+            <a @click.prevent="router.push('/meal-planner')">Meal Planner</a>
+          </li>
 
           <!-- Dynamic Login/Profile -->
           <li v-if="!userState.loggedIn">
@@ -71,27 +82,29 @@ const logout = async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* Adjusted so logo is permanently flush to the left edge */
 .nav-container {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* logo left, spacer pushes nav-right */
-  padding: 0.8rem 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  justify-content: space-between; /* logo left, nav-right right */
+  padding: 0.6rem 1rem; /* set left padding as you prefer; use 0 to be flush */
+  width: 100%;
+  margin: 0;
   font-family: "Poppins", sans-serif;
 }
-
 /* Logo */
 .logo {
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
+  margin-right: 3rem;
 }
 
 /* Spacer to push nav-right to the far right */
 .nav-center {
   flex: 1;
+  min-width: 2rem;
 }
 
 /* Right-side nav */
@@ -104,7 +117,7 @@ const logout = async () => {
 /* Nav links */
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
   list-style: none;
   transition: all 0.3s ease;
 }
@@ -114,6 +127,7 @@ const logout = async () => {
   text-decoration: none;
   font-weight: 500;
   position: relative;
+  cursor: pointer;
 }
 
 .nav-links li a::after {
