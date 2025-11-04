@@ -43,7 +43,7 @@ const logout = async () => {
         <!-- Navigation Links -->
         <ul :class="['nav-links', { active: mobileMenu }]">
           <li><a @click.prevent="router.push(userState.loggedIn ? '/dashboard' : '/')">Home</a></li>
-          
+
           <!-- Only show these on homepage -->
           <li v-if="isHomePage"><a href="#features">Features</a></li>
           <li v-if="isHomePage"><a href="#about">About</a></li>
@@ -52,6 +52,11 @@ const logout = async () => {
           <!-- Meal Planner Link (only for logged in users) -->
           <li v-if="userState.loggedIn">
             <a @click.prevent="router.push('/meal-planner')">Meal Planner</a>
+          </li>
+
+          <!-- ✅ NEW: Social / Gamification Link -->
+          <li v-if="userState.loggedIn">
+            <a @click.prevent="router.push('/social')">Social & Rewards</a>
           </li>
 
           <!-- Dynamic Login/Profile -->
@@ -86,12 +91,15 @@ const logout = async () => {
 .nav-container {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* logo left, nav-right right */
-  padding: 0.6rem 1rem; /* set left padding as you prefer; use 0 to be flush */
+  justify-content: space-between;
+  /* logo left, nav-right right */
+  padding: 0.6rem 1rem;
+  /* set left padding as you prefer; use 0 to be flush */
   width: 100%;
   margin: 0;
   font-family: "Poppins", sans-serif;
 }
+
 /* Logo */
 .logo {
   font-size: 1.6rem;
