@@ -103,8 +103,13 @@ Keep the response concise (3-4 sentences) and actionable.`;
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📊 API endpoint: http://localhost:${PORT}/api/recommendation`);
-});
+// Start server (for local development)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📊 API endpoint: http://localhost:${PORT}/api/recommendation`);
+  });
+}
+
+// Export for Vercel
+export default app;
