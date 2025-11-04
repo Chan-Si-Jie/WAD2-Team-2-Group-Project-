@@ -43,6 +43,11 @@ const logout = async () => {
           <li><a href="#about">About</a></li>
           <li><a href="#contact">Contact</a></li>
 
+          <!-- Meal Planner Link (only for logged in users) -->
+          <li v-if="userState.loggedIn">
+            <a @click.prevent="router.push('/meal-planner')">Meal Planner</a>
+          </li>
+
           <!-- Dynamic Login/Profile -->
           <li v-if="!userState.loggedIn">
             <button class="login-btn" @click="router.push('/login')">Login</button>
