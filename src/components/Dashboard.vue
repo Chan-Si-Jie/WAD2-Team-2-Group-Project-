@@ -1,12 +1,11 @@
 <template>
-  <div class="back-button" @click="goHome">
-    <img :src="backArrow" alt="Back" />
-  </div>
-  <div class="dashboard">
-    <header class="dashboard-header">
-      <h1>Welcome, {{ user?.email }}</h1>
-      <p>Track your meals, water, and nutrition today!</p>
-    </header>
+  <div>
+    <Navbar />
+    <div class="dashboard">
+      <header class="dashboard-header">
+        <h1>Welcome, {{ user?.email }}</h1>
+        <p>Track your meals, water, and nutrition today!</p>
+      </header>
 
     <section class="rings">
       <div class="ring">
@@ -24,6 +23,7 @@
       <button @click="showMealForm = true">Add Meal</button>
       <button @click="showWaterForm = true">Add Water</button>
       <button @click="showNutritionForm = true">Add Nutrition</button>
+      <button @click="$router.push('/meal-planner')">📅 Meal Planner</button>
     </section>
 
     <!-- Forms -->
@@ -116,6 +116,7 @@
         <p v-if="error" class="error-text">{{ error }}</p>
       </div>
     </section>
+    </div>
   </div>
 </template>
 
@@ -124,14 +125,10 @@ import { ref, watchEffect, onMounted } from "vue";
 import { supabase } from "@/supabase";
 import { userState } from "@/state/userState";
 import NutritionPieChart from "@/components/NutritionPieChart.vue";
+import Navbar from "@/components/Navbar.vue";
 import { useRouter } from "vue-router";
-import backArrow from "@/assets/back-arrow.png";
 
 const router = useRouter();
-
-const goHome = () => {
-  router.push("/");
-};
 
 // User
 const user = userState.user;
@@ -149,8 +146,8 @@ const recommendation = ref(null);
 const loading = ref(false);
 const error = ref(null);
 
-// Backend API URL
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Backend API URL - use relative path for Vercel, absolute for local dev
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '' : 'http://localhost:3000');
 
 // Form visibility
 const showMealForm = ref(false);
@@ -309,7 +306,8 @@ async function getRecommendation() {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to get recommendation");
+      console.error('API Error Response:', errorData);
+      throw new Error(errorData.message || errorData.error || "Failed to get recommendation");
     }
 
     const data = await response.json();
@@ -338,27 +336,6 @@ watchEffect(() => {
 </script>
 
 <style scoped>
-.back-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  width: 40px; /* bigger than login */
-  height: 40px;
-  cursor: pointer;
-  z-index: 100;
-}
-
-.back-button img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  transition: transform 0.3s ease;
-}
-
-.back-button:hover img {
-  transform: translateX(-5px);
-}
-
 .dashboard {
   max-width: 900px;
   margin: auto;

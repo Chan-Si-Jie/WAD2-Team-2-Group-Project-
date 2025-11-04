@@ -1,11 +1,15 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { userState } from "@/state/userState";
 import { supabase } from "@/supabase";
 
 const router = useRouter();
+const route = useRoute();
 const mobileMenu = ref(false);
+
+// Check if user is on homepage
+const isHomePage = computed(() => route.path === '/');
 
 const toggleMenu = () => {
   mobileMenu.value = !mobileMenu.value;
@@ -38,10 +42,17 @@ const logout = async () => {
 
         <!-- Navigation Links -->
         <ul :class="['nav-links', { active: mobileMenu }]">
-          <li><a href="#">Home</a></li>
-          <li><a href="#features">Features</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a @click.prevent="router.push(userState.loggedIn ? '/dashboard' : '/')">Home</a></li>
+          
+          <!-- Only show these on homepage -->
+          <li v-if="isHomePage"><a href="#features">Features</a></li>
+          <li v-if="isHomePage"><a href="#about">About</a></li>
+          <li v-if="isHomePage"><a href="#contact">Contact</a></li>
+
+          <!-- Meal Planner Link (only for logged in users) -->
+          <li v-if="userState.loggedIn">
+            <a @click.prevent="router.push('/meal-planner')">Meal Planner</a>
+          </li>
 
           <!-- Dynamic Login/Profile -->
           <li v-if="!userState.loggedIn">
@@ -87,11 +98,13 @@ const logout = async () => {
   font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
+  margin-right: 3rem;
 }
 
 /* Spacer to push nav-right to the far right */
 .nav-center {
   flex: 1;
+  min-width: 2rem;
 }
 
 /* Right-side nav */
@@ -104,7 +117,7 @@ const logout = async () => {
 /* Nav links */
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
   list-style: none;
   transition: all 0.3s ease;
 }
@@ -114,6 +127,7 @@ const logout = async () => {
   text-decoration: none;
   font-weight: 500;
   position: relative;
+  cursor: pointer;
 }
 
 .nav-links li a::after {
