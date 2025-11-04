@@ -26,11 +26,24 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Log API key status (first 10 chars only for security)
+    const apiKeyExists = !!process.env.GEMINI_API_KEY;
+    const apiKeyPreview = apiKeyExists 
+      ? process.env.GEMINI_API_KEY.substring(0, 10) + '...' 
+      : 'NOT SET';
+    
+    console.log('API Key status:', apiKeyExists ? 'EXISTS' : 'MISSING');
+    console.log('API Key preview:', apiKeyPreview);
+
     const { summary } = req.body;
 
     if (!summary) {
       return res.status(400).json({
         error: "Invalid request. Please provide a summary.",
+        debug: {
+          apiKeyExists,
+          apiKeyPreview
+        }
       });
     }
 
@@ -99,9 +112,16 @@ Keep the response concise (3-4 sentences) and actionable.`;
     });
   } catch (error) {
     console.error("Error generating recommendation:", error);
+    console.error("Error stack:", error.stack);
+    console.error("API Key exists:", !!process.env.GEMINI_API_KEY);
+    
     return res.status(500).json({
       error: "Failed to generate recommendation",
       message: error.message,
+      debug: {
+        errorType: error.constructor.name,
+        apiKeyExists: !!process.env.GEMINI_API_KEY
+      }
     });
   }
 }

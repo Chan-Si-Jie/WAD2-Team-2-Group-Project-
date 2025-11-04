@@ -306,7 +306,8 @@ async function getRecommendation() {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to get recommendation");
+      console.error('API Error Response:', errorData);
+      throw new Error(errorData.message || errorData.error || "Failed to get recommendation");
     }
 
     const data = await response.json();
