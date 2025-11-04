@@ -38,7 +38,7 @@ const logout = async () => {
 
         <!-- Navigation Links -->
         <ul :class="['nav-links', { active: mobileMenu }]">
-          <li><a href="#">Home</a></li>
+          <li><a @click.prevent="router.push(userState.loggedIn ? '/dashboard' : '/')">Home</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#about">About</a></li>
           <li><a href="#contact">Contact</a></li>
@@ -119,6 +119,7 @@ const logout = async () => {
   text-decoration: none;
   font-weight: 500;
   position: relative;
+  cursor: pointer;
 }
 
 .nav-links li a::after {
