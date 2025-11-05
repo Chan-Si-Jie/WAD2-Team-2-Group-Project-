@@ -11,14 +11,34 @@
 
       <!-- Tabs -->
       <div class="tabs">
-        <button :class="{ active: activeTab === 'overview' }" @click="activeTab='overview'">📊 Overview</button>
-        <button :class="{ active: activeTab === 'challenges' }" @click="activeTab='challenges'">🎯 Challenges</button>
-        <button :class="{ active: activeTab === 'achievements' }" @click="activeTab='achievements'">🏅 Achievements</button>
-        <button :class="{ active: activeTab === 'leaderboard' }" @click="activeTab='leaderboard'">🏁 Leaderboard</button>
+        <button
+          :class="{ active: activeTab === 'overview' }"
+          @click="activeTab = 'overview'"
+        >
+          📊 Overview
+        </button>
+        <button
+          :class="{ active: activeTab === 'challenges' }"
+          @click="activeTab = 'challenges'"
+        >
+          🎯 Challenges
+        </button>
+        <button
+          :class="{ active: activeTab === 'achievements' }"
+          @click="activeTab = 'achievements'"
+        >
+          🏅 Achievements
+        </button>
+        <button
+          :class="{ active: activeTab === 'leaderboard' }"
+          @click="activeTab = 'leaderboard'"
+        >
+          🏁 Leaderboard
+        </button>
       </div>
 
       <!-- Overview Tab -->
-      <div v-show="activeTab==='overview'" class="tab-content">
+      <div v-show="activeTab === 'overview'" class="tab-content">
         <div class="overview-cards">
           <div class="card">
             <h3>Points</h3>
@@ -48,7 +68,7 @@
       </div>
 
       <!-- Challenges Tab -->
-      <div v-if="activeTab==='challenges'" class="tab-content">
+      <div v-if="activeTab === 'challenges'" class="tab-content">
         <div class="filter-row">
           <label>Filter by category:</label>
           <select v-model="challengeFilter">
@@ -67,17 +87,27 @@
             :class="{ completed: challenge.progress === 100 }"
             @click="viewChallenge(challenge)"
           >
-            <span class="category-badge" :class="challenge.category">{{ challenge.category.toUpperCase() }}</span>
+            <span class="category-badge" :class="challenge.category">{{
+              challenge.category.toUpperCase()
+            }}</span>
             <h3>{{ challenge.name }}</h3>
             <p>{{ challenge.description }}</p>
 
             <div class="progress-wrapper">
-              <div class="progress-bar" :class="{ completed: challenge.progress === 100 }" :style="{ width: challenge.progress + '%' }"></div>
+              <div
+                class="progress-bar"
+                :class="{ completed: challenge.progress === 100 }"
+                :style="{ width: challenge.progress + '%' }"
+              ></div>
             </div>
-            <span class="progress-text">{{ challenge.progress }}% Complete</span>
+            <span class="progress-text"
+              >{{ challenge.progress }}% Complete</span
+            >
 
             <div class="reward-section">
-              <span class="reward-points">💰 {{ challenge.rewardPoints }} pts</span>
+              <span class="reward-points"
+                >💰 {{ challenge.rewardPoints }} pts</span
+              >
               <span class="reward-xp">⭐ {{ challenge.rewardXP }} XP</span>
             </div>
           </div>
@@ -85,7 +115,7 @@
       </div>
 
       <!-- Achievements Tab -->
-      <div v-if="activeTab==='achievements'" class="tab-content">
+      <div v-if="activeTab === 'achievements'" class="tab-content">
         <h2>🏅 Achievements</h2>
         <div class="achievements-grid">
           <div
@@ -97,14 +127,18 @@
           >
             <h3>{{ achievement.title }}</h3>
             <p>{{ achievement.description }}</p>
-            <small v-if="!achievement.unlocked">Unlock: {{ achievement.condition }}</small>
-            <span class="status">{{ achievement.unlocked ? 'Unlocked' : 'Locked' }}</span>
+            <small v-if="!achievement.unlocked"
+              >Unlock: {{ achievement.condition }}</small
+            >
+            <span class="status">{{
+              achievement.unlocked ? "Unlocked" : "Locked"
+            }}</span>
           </div>
         </div>
       </div>
 
       <!-- Leaderboard Tab -->
-      <div v-if="activeTab==='leaderboard'" class="tab-content">
+      <div v-if="activeTab === 'leaderboard'" class="tab-content">
         <h2>🏁 Leaderboard</h2>
         <div class="leaderboard-list">
           <div
@@ -121,15 +155,25 @@
     </div>
 
     <!-- Challenge Modal -->
-    <div v-if="viewingChallenge" class="modal-overlay" @click="closeChallengeView">
+    <div
+      v-if="viewingChallenge"
+      class="modal-overlay"
+      @click="closeChallengeView"
+    >
       <div class="modal-content" @click.stop>
         <h2>{{ viewingChallenge.name }}</h2>
         <p>{{ viewingChallenge.description }}</p>
         <div class="challenge-progress">
           Progress: {{ viewingChallenge.progress }}%
         </div>
-        <span>Reward: {{ viewingChallenge.rewardPoints }} pts | {{ viewingChallenge.rewardXP }} XP</span>
-        <button @click="completeChallenge(viewingChallenge.id)" class="complete-btn">
+        <span
+          >Reward: {{ viewingChallenge.rewardPoints }} pts |
+          {{ viewingChallenge.rewardXP }} XP</span
+        >
+        <button
+          @click="completeChallenge(viewingChallenge.id)"
+          class="complete-btn"
+        >
           Complete Challenge
         </button>
         <button @click="closeChallengeView" class="close-btn">Close</button>
@@ -137,7 +181,11 @@
     </div>
 
     <!-- Achievement Modal -->
-    <div v-if="viewingAchievement" class="modal-overlay" @click="closeAchievementView">
+    <div
+      v-if="viewingAchievement"
+      class="modal-overlay"
+      @click="closeAchievementView"
+    >
       <div class="modal-content" @click.stop>
         <h2>{{ viewingAchievement.title }}</h2>
         <p>{{ viewingAchievement.description }}</p>
@@ -179,7 +227,7 @@ const userChallenges = ref([]);
 
 const filteredChallenges = computed(() => {
   if (challengeFilter.value === "all") return challenges.value;
-  return challenges.value.filter(c => c.category === challengeFilter.value);
+  return challenges.value.filter((c) => c.category === challengeFilter.value);
 });
 
 // Achievements
@@ -194,10 +242,10 @@ const filteredLeaderboard = computed(() => leaderboard.value);
 const viewingChallenge = ref(null);
 const viewingAchievement = ref(null);
 
-const viewChallenge = (c) => viewingChallenge.value = c;
-const closeChallengeView = () => viewingChallenge.value = null;
-const viewAchievement = (a) => viewingAchievement.value = a;
-const closeAchievementView = () => viewingAchievement.value = null;
+const viewChallenge = (c) => (viewingChallenge.value = c);
+const closeChallengeView = () => (viewingChallenge.value = null);
+const viewAchievement = (a) => (viewingAchievement.value = a);
+const closeAchievementView = () => (viewingAchievement.value = null);
 
 // Level XP calculation - 100 points per level
 const xpForNextLevel = computed(() => 100);
@@ -658,11 +706,27 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.gamification-dashboard-page { 
-  min-height: 100vh; 
-  background: linear-gradient(135deg,#f5f7fa,#c3cfe2); 
-  padding: 2rem; 
-  font-family:"Poppins",sans-serif; 
+.gamification-dashboard-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  padding: 2rem;
+  font-family: "Poppins", sans-serif;
+}
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+.dashboard-header p {
+  color: #7f8c8d;
 }
 .dashboard { max-width: 1400px; margin:0 auto; }
 .dashboard-header { text-align:center; margin-bottom:2rem; position: relative; }
@@ -684,73 +748,261 @@ onMounted(async () => {
   transform: scale(1.05);
 }
 
-.tabs { display:flex; justify-content:center; gap:1rem; margin-bottom:2rem; }
-.tabs button { padding:0.75rem 1.5rem; border:none; border-radius:10px; cursor:pointer; background:#ecf0f1; color:#2c3e50; font-weight:500; }
-.tabs button.active { background:#3498db; color:white; }
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.tabs button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #ecf0f1;
+  color: #2c3e50;
+  font-weight: 500;
+}
+.tabs button.active {
+  background: #3498db;
+  color: white;
+}
 
-.tab-content { display:block; }
-.overview-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:2rem; }
+.tab-content {
+  display: block;
+}
+.overview-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
 
 /* Overview Card Colors */
-.card { 
-  background:white; 
-  padding:1rem 1.5rem; 
-  border-radius:15px; 
-  text-align:center; 
-  box-shadow:0 4px 8px rgba(0,0,0,0.1); 
-  color: #2c3e50; 
+.card {
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: #2c3e50;
 }
-.card h3, .card p, .card span { color: #2c3e50; }
-.card progress { width:100%; height:1rem; border-radius:5px; margin-top:0.5rem; }
+.card h3,
+.card p,
+.card span {
+  color: #2c3e50;
+}
+.card progress {
+  width: 100%;
+  height: 1rem;
+  border-radius: 5px;
+  margin-top: 0.5rem;
+}
 
-.filter-row { margin-bottom:1rem; display:flex; align-items:center; gap:1rem; }
+.filter-row {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
 
 /* Challenge Cards */
-.challenges-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
-.challenge-card { background:white; padding:1rem; border-radius:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1); cursor:pointer; transition: transform 0.2s; }
-.challenge-card:hover { transform: translateY(-3px); }
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.challenge-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.challenge-card:hover {
+  transform: translateY(-3px);
+}
 
-.category-badge { display:inline-block; margin-bottom:0.5rem; padding:0.25rem 0.5rem; font-size:0.7rem; font-weight:600; border-radius:5px; background:#ecf0f1; color:#2c3e50; }
+.category-badge {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 5px;
+  background: #ecf0f1;
+  color: #2c3e50;
+}
 
-.progress-wrapper { width:100%; height:10px; background:#ecf0f1; border-radius:5px; overflow:hidden; margin:0.5rem 0; }
-.progress-bar { height:100%; background:#3498db; transition: width 0.5s; border-radius:5px; }
-.progress-bar.completed { background: linear-gradient(90deg, #27ae60, #2ecc71); box-shadow: 0 0 10px #2ecc71, 0 0 20px #27ae60; animation: pulse 1.5s infinite; }
+.progress-wrapper {
+  width: 100%;
+  height: 10px;
+  background: #ecf0f1;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+.progress-bar {
+  height: 100%;
+  background: #3498db;
+  transition: width 0.5s;
+  border-radius: 5px;
+}
+.progress-bar.completed {
+  background: linear-gradient(90deg, #27ae60, #2ecc71);
+  box-shadow: 0 0 10px #2ecc71, 0 0 20px #27ae60;
+  animation: pulse 1.5s infinite;
+}
 
 @keyframes pulse {
-  0% { box-shadow:0 0 10px #2ecc71,0 0 20px #27ae60; transform: scaleX(1); }
-  50% { box-shadow:0 0 15px #2ecc71,0 0 30px #27ae60; transform: scaleX(1.02); }
-  100% { box-shadow:0 0 10px #2ecc71,0 0 20px #27ae60; transform: scaleX(1); }
+  0% {
+    box-shadow: 0 0 10px #2ecc71, 0 0 20px #27ae60;
+    transform: scaleX(1);
+  }
+  50% {
+    box-shadow: 0 0 15px #2ecc71, 0 0 30px #27ae60;
+    transform: scaleX(1.02);
+  }
+  100% {
+    box-shadow: 0 0 10px #2ecc71, 0 0 20px #27ae60;
+    transform: scaleX(1);
+  }
 }
 
-.challenge-card.completed { animation: bounce 0.5s ease; }
-@keyframes bounce { 0% { transform: translateY(0); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0); }
+.challenge-card.completed {
+  animation: bounce 0.5s ease;
 }
-.progress-text { font-size:0.8rem; color:#7f8c8d; }
-.reward-section { display:flex; justify-content:space-between; font-size:0.85rem; margin-top:0.5rem; }
-.reward-points { color:#f39c12; font-weight:600; }
-.reward-xp { color:#3498db; font-weight:600; }
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.progress-text {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+}
+.reward-section {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+.reward-points {
+  color: #f39c12;
+  font-weight: 600;
+}
+.reward-xp {
+  color: #3498db;
+  font-weight: 600;
+}
 
 /* Achievements */
-.achievements-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
-.achievement-card { background:white; padding:1rem; border-radius:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1); cursor:pointer; }
-.achievement-card.unlocked { border:2px solid #27ae60; }
-.achievement-card small { display:block; margin-bottom:0.5rem; color:#7f8c8d; }
-.status { font-weight:600; margin-top:0.5rem; display:block; }
-.status.unlocked { color:#27ae60; }
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.achievement-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.achievement-card.unlocked {
+  border: 2px solid #27ae60;
+}
+.achievement-card small {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #7f8c8d;
+}
+.status {
+  font-weight: 600;
+  margin-top: 0.5rem;
+  display: block;
+}
+.status.unlocked {
+  color: #27ae60;
+}
 
 /* Leaderboard */
-.leaderboard-list { display:flex; flex-direction:column; gap:0.5rem; }
-.leaderboard-item { display:flex; justify-content:space-between; padding:0.5rem 1rem; background:white; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-.leaderboard-item.me { background:#f1c40f; color:white; font-weight:600; }
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.leaderboard-item.me {
+  background: #f1c40f;
+  color: white;
+  font-weight: 600;
+}
 
 /* Modals */
-.modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:1000; padding:2rem; }
-.modal-content { background:white; padding:2rem; border-radius:20px; max-width:500px; width:100%; }
-.close-btn, .complete-btn { margin-top:1rem; width:100%; padding:0.75rem; border:none; border-radius:10px; cursor:pointer; font-weight:600; }
-.close-btn { background:#95a5a6; color:white; }
-.complete-btn { background:#27ae60; color:white; }
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+}
+.close-btn,
+.complete-btn {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.close-btn {
+  background: #95a5a6;
+  color: white;
+}
+.complete-btn {
+  background: #27ae60;
+  color: white;
+}
 
 /* Chart Section */
-.chart-section { background:white; padding:1rem; border-radius:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1); margin-top:2rem; color:#2c3e50; }
-.chart-section h3 { color:#2c3e50; }
+.chart-section {
+  background: white;
+  padding: 1rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+  color: #2c3e50;
+}
+.chart-section h3 {
+  color: #2c3e50;
+}
 </style>

@@ -14,7 +14,7 @@
           </p>
           <div class="button-group">
             <button @click="$router.push('/dashboard')" class="cta-btn">
-              Get Started
+              Dashboard
             </button>
             <button @click="$router.push('/fitness')" class="fitness-btn">
               Go to Fitness Tracker
