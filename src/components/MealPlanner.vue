@@ -466,7 +466,7 @@ const closeMealSelector = () => {
 };
 
 const addRecipeToPlanner = async (recipe) => {
-  await supabase.from("planned_meals").insert([
+  const { data, error } = await supabase.from("planned_meals").insert([
     {
       user_id: user.id,
       date: selectedDate.value,
@@ -479,12 +479,20 @@ const addRecipeToPlanner = async (recipe) => {
       recipe_id: recipe.id,
     },
   ]);
+  
+  if (error) {
+    console.error("Error logging meal:", error);
+    alert("Failed to log meal. Please try again.");
+    return;
+  }
+  
+  console.log("✅ Meal logged successfully! Stats should be updated automatically.");
   await fetchPlannedMeals();
   closeMealSelector();
 };
 
 const addFavoriteToPlanner = async (fav) => {
-  await supabase.from("planned_meals").insert([
+  const { data, error } = await supabase.from("planned_meals").insert([
     {
       user_id: user.id,
       date: selectedDate.value,
@@ -497,6 +505,14 @@ const addFavoriteToPlanner = async (fav) => {
       favorite_id: fav.id,
     },
   ]);
+  
+  if (error) {
+    console.error("Error logging meal:", error);
+    alert("Failed to log meal. Please try again.");
+    return;
+  }
+  
+  console.log("✅ Meal logged successfully! Stats should be updated automatically.");
   await fetchPlannedMeals();
   closeMealSelector();
 };

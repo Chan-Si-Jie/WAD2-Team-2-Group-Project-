@@ -60,16 +60,19 @@ const login = async () => {
     return;
   }
 
+  console.log('Attempting login with:', email.value);
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email.value,
     password: password.value,
   });
 
   if (error) {
+    console.error('Login error:', error);
     if (error.message.includes("Invalid login credentials")) {
       alert("Incorrect email or password. Please try again.");
-    } else if (error.message.includes("email not confirmed")) {
-      alert("Please confirm your email before logging in.");
+    } else if (error.message.includes("email not confirmed") || error.message.includes("Email not confirmed")) {
+      alert("Please confirm your email before logging in. Check your inbox for the confirmation link.");
     } else {
       alert(`Login failed: ${error.message}`);
     }
@@ -77,6 +80,7 @@ const login = async () => {
   }
 
   if (data?.user) {
+    console.log('Login successful:', data.user);
     // Save user state
     userState.loggedIn = true;
     userState.user = data.user;

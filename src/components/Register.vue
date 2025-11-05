@@ -83,6 +83,19 @@ const register = async () => {
     return;
   }
 
+  // Validate password length
+  if (password.value.length < 6) {
+    alert("Password must be at least 6 characters long!");
+    return;
+  }
+
+  console.log('Attempting registration with:', {
+    email: email.value,
+    passwordLength: password.value.length,
+    name: name.value,
+    phone: phone.value
+  });
+
   const { data, error } = await supabase.auth.signUp({
     email: email.value,
     password: password.value,
@@ -95,6 +108,7 @@ const register = async () => {
   });
 
   if (error) {
+    console.error('Registration error:', error);
     if (
       error.message.includes("already registered") ||
       error.message.includes("User already exists")
@@ -102,6 +116,8 @@ const register = async () => {
       alert(
         "This email is already registered or pending confirmation. Please login or confirm your email."
       );
+    } else if (error.message.includes("Email rate limit exceeded")) {
+      alert("Too many signup attempts. Please try again later.");
     } else {
       alert(`Registration failed: ${error.message}`);
     }
@@ -109,6 +125,7 @@ const register = async () => {
   }
 
   if (data?.user) {
+    console.log('Registration successful:', data.user);
     alert(
       "Signup successful! Please check your email to confirm your account before logging in."
     );
