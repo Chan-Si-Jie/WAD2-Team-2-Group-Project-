@@ -6,6 +6,7 @@
       <header class="dashboard-header">
         <h1>🏆 Gamification Dashboard</h1>
         <p>Track your achievements, points, and challenges</p>
+        <button @click="refreshAllData" class="refresh-btn">🔄 Refresh Stats</button>
       </header>
 
       <!-- Tabs -->
@@ -144,10 +145,10 @@
             v-for="player in filteredLeaderboard"
             :key="player.id"
             class="leaderboard-item"
-            :class="{ me: player.id === currentUser.id }"
+            :class="{ me: player.id === userState.user?.id }"
           >
-            <span>{{ player.rank }}. {{ player.name }}</span>
-            <span>{{ player.points }} pts</span>
+            <span>{{ player.rank }}. {{ player.name }} {{ player.id === userState.user?.id ? '(You)' : '' }}</span>
+            <span>{{ player.points }} pts - Lv. {{ player.level }}</span>
           </div>
         </div>
       </div>
@@ -201,153 +202,28 @@
 import { ref, computed, onMounted } from "vue";
 import Navbar from "@/components/Navbar.vue";
 import Chart from "chart.js/auto";
+import { supabase } from "@/supabase";
+import { userState } from "@/state/userState";
 
 // Tabs
 const activeTab = ref("overview");
 
-// Dummy Data & User
-const currentUser = { id: 9, name: "You" };
-const userPoints = ref(1200);
-const userLevel = ref(5);
-const userXP = ref(450);
-const badges = ref(["Beginner", "Explorer"]);
-const dailyStreak = ref(3);
+// User Data - fetched from Supabase
+const currentUser = computed(() => ({
+  id: userState.user?.id,
+  name: userState.user?.email?.split('@')[0] || "You"
+}));
+const userPoints = ref(0);
+const userLevel = ref(1);
+const userXP = ref(0);
+const badges = ref([]);
+const dailyStreak = ref(0);
+const totalMealsLogged = ref(0);
 
 // Challenges
 const challengeFilter = ref("all");
-const challenges = ref([
-  // Daily
-  {
-    id: 1,
-    name: "Daily Login",
-    description: "Login 7 days in a row",
-    category: "daily",
-    progress: 40,
-    rewardPoints: 50,
-    rewardXP: 50,
-  },
-  {
-    id: 2,
-    name: "Complete 5 Tasks",
-    description: "Finish 5 daily tasks",
-    category: "daily",
-    progress: 20,
-    rewardPoints: 100,
-    rewardXP: 80,
-  },
-  {
-    id: 3,
-    name: "Morning Stretch",
-    description: "Spend 5 minutes stretching",
-    category: "daily",
-    progress: 0,
-    rewardPoints: 30,
-    rewardXP: 20,
-  },
-  {
-    id: 4,
-    name: "Water Tracker",
-    description: "Drink 8 glasses of water",
-    category: "daily",
-    progress: 0,
-    rewardPoints: 40,
-    rewardXP: 25,
-  },
-  {
-    id: 5,
-    name: "Check Notifications",
-    description: "Check all app notifications",
-    category: "daily",
-    progress: 0,
-    rewardPoints: 20,
-    rewardXP: 15,
-  },
-
-  // Weekly
-  {
-    id: 6,
-    name: "Weekly Marathon",
-    description: "Complete 20 tasks this week",
-    category: "weekly",
-    progress: 50,
-    rewardPoints: 300,
-    rewardXP: 200,
-  },
-  {
-    id: 7,
-    name: "Weekly Social",
-    description: "Share your progress on social media",
-    category: "weekly",
-    progress: 0,
-    rewardPoints: 150,
-    rewardXP: 120,
-  },
-  {
-    id: 8,
-    name: "Skill Builder",
-    description: "Learn something new this week",
-    category: "weekly",
-    progress: 0,
-    rewardPoints: 200,
-    rewardXP: 150,
-  },
-  {
-    id: 9,
-    name: "Weekly Reflection",
-    description: "Write a short reflection about your week",
-    category: "weekly",
-    progress: 0,
-    rewardPoints: 100,
-    rewardXP: 80,
-  },
-
-  // Special
-  {
-    id: 10,
-    name: "Holiday Challenge",
-    description: "Complete a festive activity",
-    category: "special",
-    progress: 0,
-    rewardPoints: 500,
-    rewardXP: 300,
-  },
-  {
-    id: 11,
-    name: "Monthly Master",
-    description: "Achieve 90% of all weekly goals this month",
-    category: "special",
-    progress: 0,
-    rewardPoints: 600,
-    rewardXP: 400,
-  },
-  {
-    id: 12,
-    name: "Community Helper",
-    description: "Help another user complete a challenge",
-    category: "special",
-    progress: 0,
-    rewardPoints: 400,
-    rewardXP: 250,
-  },
-  {
-    id: 13,
-    name: "Fitness Fanatic",
-    description: "Complete a full workout session",
-    category: "special",
-    progress: 0,
-    rewardPoints: 350,
-    rewardXP: 220,
-  },
-  {
-    id: 14,
-    name: "Eco Warrior",
-    description: "Complete an environmentally friendly task",
-    category: "special",
-    progress: 0,
-    rewardPoints: 300,
-    rewardXP: 200,
-  },
-]);
+const challenges = ref([]);
+const userChallenges = ref([]);
 
 const filteredChallenges = computed(() => {
   if (challengeFilter.value === "all") return challenges.value;
@@ -355,135 +231,11 @@ const filteredChallenges = computed(() => {
 });
 
 // Achievements
-const achievements = ref([
-  {
-    id: 1,
-    title: "First Steps",
-    description: "Complete your first challenge",
-    condition: "Complete any challenge",
-    unlocked: true,
-  },
-  {
-    id: 2,
-    title: "Task Master",
-    description: "Complete 50 tasks",
-    condition: "Complete 50 tasks",
-    unlocked: false,
-  },
-  {
-    id: 3,
-    title: "Streak Keeper",
-    description: "Maintain a 7-day streak",
-    condition: "Login 7 days consecutively",
-    unlocked: false,
-  },
-
-  // New Achievements
-  {
-    id: 4,
-    title: "Daily Devotee",
-    description: "Complete 5 daily challenges",
-    condition: "Finish 5 daily challenges",
-    unlocked: false,
-  },
-  {
-    id: 5,
-    title: "Weekly Warrior",
-    description: "Complete 3 weekly challenges",
-    condition: "Finish 3 weekly challenges",
-    unlocked: false,
-  },
-  {
-    id: 6,
-    title: "Specialist",
-    description: "Complete 2 special challenges",
-    condition: "Finish 2 special challenges",
-    unlocked: false,
-  },
-  {
-    id: 7,
-    title: "Hydration Hero",
-    description: "Complete the Water Tracker challenge 7 times",
-    condition: "Drink 8 glasses daily for a week",
-    unlocked: false,
-  },
-  {
-    id: 8,
-    title: "Early Bird",
-    description: "Complete a challenge before 8 AM",
-    condition: "Finish a morning challenge",
-    unlocked: false,
-  },
-  {
-    id: 9,
-    title: "Social Butterfly",
-    description: "Share your progress 5 times",
-    condition: "Share achievements or challenges on social media",
-    unlocked: false,
-  },
-  {
-    id: 10,
-    title: "Level Up!",
-    description: "Reach level 10",
-    condition: "Earn enough XP to reach level 10",
-    unlocked: false,
-  },
-  {
-    id: 11,
-    title: "Explorer",
-    description: "Complete challenges in all categories",
-    condition: "Finish at least one daily, weekly, and special challenge",
-    unlocked: false,
-  },
-  {
-    id: 12,
-    title: "Marathoner",
-    description: "Complete 20 challenges in total",
-    condition: "Finish 20 challenges",
-    unlocked: false,
-  },
-  {
-    id: 13,
-    title: "Eco Warrior",
-    description: "Complete all environmentally-friendly challenges",
-    condition: "Finish all eco-related challenges",
-    unlocked: false,
-  },
-  {
-    id: 14,
-    title: "Community Helper",
-    description: "Assist other players in challenges",
-    condition: "Help other users complete challenges",
-    unlocked: false,
-  },
-  {
-    id: 15,
-    title: "Ultimate Gamer",
-    description: "Complete every achievement",
-    condition: "Unlock all achievements",
-    unlocked: false,
-  },
-]);
+const achievements = ref([]);
+const unlockedAchievements = ref([]);
 
 // Leaderboard
-const leaderboard = ref([
-  { id: 1, rank: 1, name: "Alice", points: 2500 },
-  { id: 2, rank: 2, name: "Bob", points: 2100 },
-  { id: 3, rank: 3, name: "Charlie", points: 1800 },
-  { id: 4, rank: 4, name: "Diana", points: 1600 },
-  { id: 5, rank: 5, name: "Ethan", points: 1400 },
-  { id: 6, rank: 6, name: "Fiona", points: 1300 },
-  { id: 7, rank: 7, name: "George", points: 1250 },
-  { id: 8, rank: 8, name: "Hannah", points: 1200 },
-  { id: 9, rank: 9, name: "You", points: userPoints.value }, // current user
-  { id: 10, rank: 10, name: "Ian", points: 1100 },
-  { id: 11, rank: 11, name: "Jane", points: 1000 },
-  { id: 12, rank: 12, name: "Kevin", points: 950 },
-  { id: 13, rank: 13, name: "Lily", points: 900 },
-  { id: 14, rank: 14, name: "Mike", points: 850 },
-  { id: 15, rank: 15, name: "Nina", points: 800 },
-]);
-
+const leaderboard = ref([]);
 const filteredLeaderboard = computed(() => leaderboard.value);
 
 // Modals
@@ -495,59 +247,461 @@ const closeChallengeView = () => (viewingChallenge.value = null);
 const viewAchievement = (a) => (viewingAchievement.value = a);
 const closeAchievementView = () => (viewingAchievement.value = null);
 
-// Level XP calculation
-const xpForNextLevel = computed(() => 500 * userLevel.value);
+// Level XP calculation - 100 points per level
+const xpForNextLevel = computed(() => 100);
 
-// Complete Challenge
-const completeChallenge = (id) => {
-  const ch = challenges.value.find((c) => c.id === id);
-  if (ch && ch.progress < 100) {
-    ch.progress = 100;
-    userPoints.value += ch.rewardPoints;
-    userXP.value += ch.rewardXP;
+// Fetch user stats from Supabase
+const fetchUserStats = async () => {
+  if (!userState.user) {
+    console.log('No user logged in');
+    return;
+  }
 
-    // Level up
-    if (userXP.value >= xpForNextLevel.value) {
-      userLevel.value++;
-      userXP.value -= xpForNextLevel.value;
-      alert(`🎉 Level Up! You are now level ${userLevel.value}`);
-    }
+  console.log('Fetching stats for user:', userState.user.id);
 
-    // Unlock achievements automatically
-    achievements.value.forEach((a) => {
-      if (!a.unlocked) {
-        if (a.id === 2 && userPoints.value >= 500) a.unlocked = true;
-        if (a.id === 3 && dailyStreak.value >= 7) a.unlocked = true;
-      }
-    });
+  const { data, error } = await supabase
+    .from('user_stats')
+    .select('*')
+    .eq('user_id', userState.user.id)
+    .maybeSingle();
 
-    alert(`Challenge "${ch.name}" completed! 🎉`);
+  if (error) {
+    console.error('Error fetching user stats:', error);
+    // Create initial stats if they don't exist
+    await initializeUserStats();
+  } else if (data) {
+    console.log('✅ User stats loaded:', data);
+    userPoints.value = data.total_points || 0;
+    dailyStreak.value = data.current_streak || 0;
+    totalMealsLogged.value = data.total_meals_logged || 0;
+    
+    // Calculate level based on points (100 points per level)
+    userLevel.value = Math.floor((data.total_points || 0) / 100) + 1;
+    
+    // Calculate XP (points within current level)
+    userXP.value = (data.total_points || 0) % 100;
+  } else {
+    console.log('No stats found, initializing...');
+    await initializeUserStats();
   }
 };
 
+// Initialize user stats for new users
+const initializeUserStats = async () => {
+  if (!userState.user) return;
+
+  console.log('Initializing user stats for:', userState.user.id);
+
+  const { data, error } = await supabase
+    .from('user_stats')
+    .insert([{
+      user_id: userState.user.id,
+      total_points: 0,
+      current_streak: 0,
+      longest_streak: 0,
+      total_meals_logged: 0
+    }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error initializing user stats:', error);
+  } else {
+    console.log('✅ User stats initialized:', data);
+    userPoints.value = 0;
+    userLevel.value = 1;
+    dailyStreak.value = 0;
+    totalMealsLogged.value = 0;
+  }
+};
+
+// Fetch all achievements
+const fetchAchievements = async () => {
+  const { data, error } = await supabase
+    .from('achievements')
+    .select('*')
+    .order('id');
+
+  if (error) {
+    console.error('Error fetching achievements:', error);
+    return;
+  }
+
+  if (!data) return;
+
+  // Fetch user's unlocked achievements
+  const { data: userAchievements, error: userAchError } = await supabase
+    .from('user_achievements')
+    .select('achievement_id, unlocked_at')
+    .eq('user_id', userState.user?.id);
+
+  if (userAchError) {
+    console.error('Error fetching user achievements:', userAchError);
+  }
+
+  const unlockedIds = new Set(userAchievements?.map(ua => ua.achievement_id) || []);
+
+  achievements.value = data.map(achievement => ({
+    id: achievement.id,
+    title: achievement.name,
+    description: achievement.description,
+    condition: achievement.description, // Use description since requirement doesn't exist
+    unlocked: unlockedIds.has(achievement.id),
+    icon: achievement.icon || '🏅'
+  }));
+
+  badges.value = achievements.value.filter(a => a.unlocked).map(a => a.title);
+  console.log('✅ Achievements loaded:', achievements.value.length, 'total,', badges.value.length, 'unlocked');
+};
+
+// Fetch challenges and user progress
+const fetchChallenges = async () => {
+  const { data, error } = await supabase
+    .from('challenges')
+    .select('*')
+    .order('id');
+
+  if (error) {
+    console.error('Error fetching challenges:', error);
+    return;
+  }
+
+  if (!data) return;
+
+  // Fetch user challenge progress
+  const { data: userChallengeData, error: userChalError } = await supabase
+    .from('user_challenges')
+    .select('*')
+    .eq('user_id', userState.user?.id);
+
+  if (userChalError) {
+    console.error('Error fetching user challenges:', userChalError);
+  }
+
+  const userProgressMap = new Map(
+    userChallengeData?.map(uc => [uc.challenge_id, uc]) || []
+  );
+
+  challenges.value = data.map(challenge => {
+    const userProgress = userProgressMap.get(challenge.id);
+    const progress = userProgress 
+      ? Math.min(100, Math.round((userProgress.current_progress / challenge.target_value) * 100))
+      : 0;
+
+    // Calculate reward based on challenge type (since reward_points doesn't exist)
+    const rewardPoints = challenge.challenge_type === 'daily' ? 50 : 
+                        challenge.challenge_type === 'weekly' ? 100 : 150;
+
+    return {
+      id: challenge.id,
+      name: challenge.name,
+      description: challenge.description,
+      category: challenge.challenge_type,
+      progress: progress,
+      rewardPoints: rewardPoints,
+      rewardXP: rewardPoints,
+      isCompleted: userProgress?.is_completed || false,
+      currentProgress: userProgress?.current_progress || 0,
+      targetValue: challenge.target_value
+    };
+  });
+
+  console.log('✅ Challenges loaded:', challenges.value.length);
+};
+
+// Fetch leaderboard
+const fetchLeaderboard = async () => {
+  // First, get all users who have stats (without level column that may not exist)
+  const { data: statsData, error: statsError } = await supabase
+    .from('user_stats')
+    .select('user_id, total_points, current_streak')
+    .order('total_points', { ascending: false })
+    .limit(50);
+
+  if (statsError) {
+    console.error('Error fetching leaderboard stats:', statsError);
+  }
+
+  // Get all registered users from auth.users table via a custom query
+  // Since we can't directly query auth.users, we'll use the users who logged meals
+  const { data: usersData, error: usersError } = await supabase
+    .from('planned_meals')
+    .select('user_id')
+    .limit(100);
+
+  if (usersError) {
+    console.error('Error fetching users:', usersError);
+  }
+
+  // Create a Set of all unique user IDs
+  const allUserIds = new Set();
+  
+  // Add users from stats
+  statsData?.forEach(stat => allUserIds.add(stat.user_id));
+  
+  // Add users from planned_meals (users who have logged meals)
+  usersData?.forEach(meal => allUserIds.add(meal.user_id));
+  
+  // Add current user
+  if (userState.user?.id) {
+    allUserIds.add(userState.user.id);
+  }
+
+  // Create a map of user stats
+  const statsMap = new Map(
+    statsData?.map(stat => [stat.user_id, stat]) || []
+  );
+
+  // Build leaderboard with all users
+  const leaderboardData = Array.from(allUserIds).map(userId => {
+    const stats = statsMap.get(userId);
+    return {
+      id: userId,
+      name: userId === userState.user?.id ? 'You' : `Player`,
+      points: stats?.total_points || 0,
+      level: userLevel.value || 1, // Use computed level from state
+      streak: stats?.current_streak || 0
+    };
+  });
+
+  // Sort by points (descending) and assign ranks
+  leaderboardData.sort((a, b) => b.points - a.points);
+  
+  leaderboard.value = leaderboardData.slice(0, 20).map((entry, index) => ({
+    ...entry,
+    rank: index + 1,
+    name: entry.id === userState.user?.id ? 'You' : `Player ${index + 1}`
+  }));
+
+  console.log('✅ Leaderboard loaded:', leaderboard.value.length, 'players');
+};
+
+// Complete Challenge
+const completeChallenge = async (id) => {
+  const ch = challenges.value.find(c => c.id === id);
+  if (!ch || ch.isCompleted) {
+    alert('Challenge already completed or not found!');
+    return;
+  }
+
+  // Update user_challenges
+  const { error: challengeError } = await supabase
+    .from('user_challenges')
+    .upsert({
+      user_id: userState.user.id,
+      challenge_id: ch.id,
+      current_progress: ch.targetValue,
+      is_completed: true,
+      completed_at: new Date().toISOString()
+    });
+
+  if (challengeError) {
+    console.error('Error completing challenge:', challengeError);
+    alert('Failed to complete challenge');
+    return;
+  }
+
+  // Update user_stats points
+  const { error: statsError } = await supabase
+    .from('user_stats')
+    .update({
+      total_points: userPoints.value + ch.rewardPoints
+    })
+    .eq('user_id', userState.user.id);
+
+  if (!statsError) {
+    ch.progress = 100;
+    ch.isCompleted = true;
+    userPoints.value += ch.rewardPoints;
+    userXP.value += ch.rewardXP;
+
+    // Level up logic - recalculate level based on points
+    const newLevel = Math.floor(userPoints.value / 100) + 1;
+    if (newLevel > userLevel.value) {
+      userLevel.value = newLevel;
+      alert(`🎉 Level Up! You are now level ${userLevel.value}`);
+    }
+    
+    // Recalculate XP within current level
+    userXP.value = userPoints.value % 100;
+
+    // Check for new achievements
+    await checkAndUnlockAchievements();
+
+    alert(`Challenge "${ch.name}" completed! 🎉`);
+    closeChallengeView();
+    
+    // Refresh data
+    await fetchUserStats();
+    await fetchChallenges();
+  }
+};
+
+// Check and unlock achievements
+const checkAndUnlockAchievements = async () => {
+  // Fetch current stats
+  await fetchUserStats();
+
+  console.log('🏆 Checking achievements...', {
+    totalMealsLogged: totalMealsLogged.value,
+    dailyStreak: dailyStreak.value,
+    achievements: achievements.value.length
+  });
+
+  for (const achievement of achievements.value) {
+    if (achievement.unlocked) continue;
+
+    let shouldUnlock = false;
+
+    // Check achievement conditions by name (since IDs are UUIDs)
+    switch (achievement.title) {
+      case 'First Steps': // Log 1 meal
+        shouldUnlock = totalMealsLogged.value >= 1;
+        break;
+      case 'Week Warrior': // 7 day streak
+        shouldUnlock = dailyStreak.value >= 7;
+        break;
+      case 'Month Master': // 30 day streak
+        shouldUnlock = dailyStreak.value >= 30;
+        break;
+      case 'Century Club': // 100 meals
+        shouldUnlock = totalMealsLogged.value >= 100;
+        break;
+      case 'Consistency King': // 50 day streak
+        shouldUnlock = dailyStreak.value >= 50;
+        break;
+      case 'Nutrition Ninja': // 500 meals
+        shouldUnlock = totalMealsLogged.value >= 500;
+        break;
+    }
+
+    console.log(`Checking achievement ${achievement.id} (${achievement.title}): ${shouldUnlock}`);
+
+    if (shouldUnlock) {
+      const { error } = await supabase
+        .from('user_achievements')
+        .insert({
+          user_id: userState.user.id,
+          achievement_id: achievement.id
+        });
+
+      if (!error) {
+        achievement.unlocked = true;
+        badges.value.push(achievement.title);
+        console.log(`✅ Achievement unlocked: ${achievement.title}`);
+        alert(`🏆 Achievement Unlocked: ${achievement.title}!`);
+      } else {
+        console.error('Error unlocking achievement:', error);
+      }
+    }
+  }
+};
+
+// Refresh all data
+const refreshAllData = async () => {
+  console.log('🔄 Refreshing all data...');
+  await fetchUserStats();
+  await fetchAchievements();
+  await fetchChallenges();
+  await fetchLeaderboard();
+  
+  // Check for new achievements after fetching data
+  await checkAndUnlockAchievements();
+  
+  console.log('✅ All data refreshed!');
+};
+
+// Get points for last 7 days
+const getPointsLast7Days = async () => {
+  if (!userState.user) return Array(7).fill(0);
+
+  const today = new Date();
+  const last7Days = [];
+  
+  // Get dates for last 7 days
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    last7Days.push(date.toISOString().split('T')[0]);
+  }
+
+  // Count meals per day (each meal = 10 points)
+  const { data: meals } = await supabase
+    .from('planned_meals')
+    .select('date')
+    .eq('user_id', userState.user.id)
+    .gte('date', last7Days[0])
+    .lte('date', last7Days[6]);
+
+  // Count meals per day
+  const mealCounts = {};
+  meals?.forEach(meal => {
+    mealCounts[meal.date] = (mealCounts[meal.date] || 0) + 1;
+  });
+
+  // Convert to points (10 points per meal) and cumulative
+  let cumulative = 0;
+  return last7Days.map(date => {
+    const dailyMeals = mealCounts[date] || 0;
+    cumulative += dailyMeals * 10;
+    return cumulative;
+  });
+};
+
 // Chart
-onMounted(() => {
-  const ctx = document.getElementById("pointsChart").getContext("2d");
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      datasets: [
-        {
-          label: "Points",
-          data: [50, 75, 100, 120, 80, 90, userPoints.value],
+let chartInstance = null;
+
+onMounted(async () => {
+  console.log('🎮 Social Gamification component mounted');
+  
+  // Fetch all data
+  await refreshAllData();
+
+  // Get actual points data
+  const pointsData = await getPointsLast7Days();
+  
+  // Get day labels
+  const today = new Date();
+  const dayLabels = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+    dayLabels.push(dayName);
+  }
+
+  // Initialize chart
+  const ctx = document.getElementById("pointsChart")?.getContext("2d");
+  if (ctx) {
+    chartInstance = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: dayLabels,
+        datasets: [{
+          label: "Total Points",
+          data: pointsData,
           borderColor: "#3498db",
           backgroundColor: "rgba(52,152,219,0.2)",
           tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { 
+          legend: { display: true },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return 'Points: ' + context.parsed.y;
+              }
+            }
+          }
         },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true } },
-    },
-  });
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
 });
 </script>
 
@@ -573,6 +727,25 @@ onMounted(() => {
 }
 .dashboard-header p {
   color: #7f8c8d;
+}
+.dashboard { max-width: 1400px; margin:0 auto; }
+.dashboard-header { text-align:center; margin-bottom:2rem; position: relative; }
+.dashboard-header h1 { font-size:2.5rem; margin-bottom:0.5rem; color:#2c3e50; }
+.dashboard-header p { color:#7f8c8d; }
+.refresh-btn { 
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem; 
+  border: none; 
+  border-radius: 10px; 
+  background: #3498db; 
+  color: white; 
+  font-weight: 600; 
+  cursor: pointer; 
+  transition: all 0.3s;
+}
+.refresh-btn:hover { 
+  background: #2980b9; 
+  transform: scale(1.05);
 }
 
 .tabs {
