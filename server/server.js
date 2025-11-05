@@ -172,6 +172,126 @@ app.get("/api/food/search", async (req, res) => {
   }
 });
 
+// Spoonacular Recipe API endpoints
+// Search recipes
+app.get("/api/recipes/search", async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query || query.length < 2) {
+      return res.status(400).json({
+        error: "Query must be at least 2 characters long",
+      });
+    }
+
+    const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
+    
+    if (!SPOONACULAR_API_KEY) {
+      return res.status(500).json({
+        error: "Spoonacular API key not configured",
+      });
+    }
+
+    const encodedQuery = encodeURIComponent(query);
+    const url = `https://api.spoonacular.com/recipes/complexSearch?query=${encodedQuery}&number=12&addRecipeNutrition=true&addRecipeInformation=true&fillIngredients=true&apiKey=${SPOONACULAR_API_KEY}`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Spoonacular API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    res.json({
+      recipes: data.results || [],
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error searching recipes:", error);
+    res.status(500).json({
+      error: "Failed to search recipes",
+      message: error.message,
+    });
+  }
+});
+
+// Get random recipes
+app.get("/api/recipes/random", async (req, res) => {
+  try {
+    const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
+    
+    if (!SPOONACULAR_API_KEY) {
+      return res.status(500).json({
+        error: "Spoonacular API key not configured",
+      });
+    }
+
+    const url = `https://api.spoonacular.com/recipes/random?number=12&apiKey=${SPOONACULAR_API_KEY}`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Spoonacular API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    res.json({
+      recipes: data.recipes || [],
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error fetching random recipes:", error);
+    res.status(500).json({
+      error: "Failed to fetch random recipes",
+      message: error.message,
+    });
+  }
+});
+
+// Get recipe details with nutrition
+app.get("/api/recipes/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        error: "Recipe ID is required",
+      });
+    }
+
+    const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
+    
+    if (!SPOONACULAR_API_KEY) {
+      return res.status(500).json({
+        error: "Spoonacular API key not configured",
+      });
+    }
+
+    const url = `https://api.spoonacular.com/recipes/${id}/information?includeNutrition=true&apiKey=${SPOONACULAR_API_KEY}`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Spoonacular API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    res.json({
+      recipe: data,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error fetching recipe details:", error);
+    res.status(500).json({
+      error: "Failed to fetch recipe details",
+      message: error.message,
+    });
+  }
+});
+
 // Start server (for local development)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
