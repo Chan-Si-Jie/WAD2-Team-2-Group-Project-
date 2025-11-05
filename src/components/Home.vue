@@ -120,7 +120,7 @@
                 <i class="fas fa-envelope"></i>
               </div>
               <h4>Email Us</h4>
-              <a href="mailto:hello@smartcal.com">hello@smartcal.com</a>
+              <a href="mailto:jaykinchan@gmail.com">jaykinchan@gmail.com</a>
               <p class="info-desc">We'll respond within 24 hours</p>
             </div>
             
@@ -157,6 +157,7 @@
                 <input 
                   type="text" 
                   id="name"
+                  v-model="contactForm.name"
                   placeholder="John Doe" 
                   required 
                 />
@@ -169,6 +170,7 @@
                 <input 
                   type="email" 
                   id="email"
+                  v-model="contactForm.email"
                   placeholder="john@example.com" 
                   required 
                 />
@@ -180,16 +182,21 @@
                 </label>
                 <textarea 
                   id="message"
+                  v-model="contactForm.message"
                   rows="5" 
                   placeholder="Tell us how we can help you..." 
                   required
                 ></textarea>
               </div>
               
-              <button type="submit" class="submit-btn">
-                <span>Send Message</span>
+              <button type="submit" class="submit-btn" :disabled="sending">
+                <span>{{ sending ? 'Sending...' : 'Send Message' }}</span>
                 <i class="fas fa-paper-plane"></i>
               </button>
+              
+              <div v-if="submitMessage" class="submit-message" :class="submitSuccess ? 'success' : 'error'">
+                {{ submitMessage }}
+              </div>
             </form>
           </div>
         </div>
@@ -206,12 +213,64 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import Navbar from "../components/Navbar.vue";
 import AnimatedModel from "../components/AnimatedModel.vue";
 
-const handleSubmit = (event) => {
-  alert("Thank you for your message! We'll get back to you soon.");
-  event.target.reset();
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+const contactForm = ref({
+  name: "",
+  email: "",
+  message: ""
+});
+
+const sending = ref(false);
+const submitMessage = ref("");
+const submitSuccess = ref(false);
+
+const handleSubmit = async () => {
+  sending.value = true;
+  submitMessage.value = "";
+  submitSuccess.value = false;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/contact/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(contactForm.value),
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      submitSuccess.value = true;
+      submitMessage.value = data.message || "Thank you for your message! We've sent a confirmation email to you.";
+      
+      // Reset form
+      contactForm.value = {
+        name: "",
+        email: "",
+        message: ""
+      };
+    } else {
+      submitSuccess.value = false;
+      submitMessage.value = data.error || "Failed to send message. Please try again.";
+    }
+  } catch (error) {
+    console.error("Error sending contact form:", error);
+    submitSuccess.value = false;
+    submitMessage.value = "An error occurred. Please try again later.";
+  } finally {
+    sending.value = false;
+    
+    // Clear message after 5 seconds
+    setTimeout(() => {
+      submitMessage.value = "";
+    }, 5000);
+  }
 };
 </script>
 
@@ -716,6 +775,50 @@ body {
 
 .submit-btn:hover i {
   transform: translateX(5px);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.submit-btn:disabled:hover {
+  transform: none;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.submit-message {
+  margin-top: 15px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  animation: slideIn 0.3s ease;
+}
+
+.submit-message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.submit-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* RESPONSIVE DESIGN */

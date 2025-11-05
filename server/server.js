@@ -292,6 +292,166 @@ app.get("/api/recipes/:id", async (req, res) => {
   }
 });
 
+// Contact form email notification
+app.post("/api/contact/send", async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({
+        error: "All fields are required",
+      });
+    }
+
+    const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "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";
+
+    // Step 1: Send immediate confirmation email
+    const confirmationBody = `Thank you for contacting SmartCal!
+
+Hi ${name},
+
+We've received your message and wanted to confirm that it's been successfully delivered to our team. We appreciate you taking the time to reach out to us!
+
+Your Message:
+${message}
+
+Our AI-powered support system is analyzing your message and will send you a detailed response shortly. You should receive it within the next few minutes.
+
+Best regards,
+The SmartCal Team
+
+---
+This is an automated confirmation email.`;
+
+    const confirmationEmail = {
+      personalizations: [
+        {
+          to: [{ email: email, name: name }],
+          subject: "Thank you for contacting SmartCal!",
+        },
+      ],
+      from: {
+        email: "jaykinchan@gmail.com",
+        name: "SmartCal Team",
+      },
+      content: [
+        {
+          type: "text/plain",
+          value: confirmationBody,
+        },
+      ],
+    };
+
+    console.log("Sending confirmation email to:", email);
+
+    // Send confirmation email
+    const confirmResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${SENDGRID_API_KEY}`,
+      },
+      body: JSON.stringify(confirmationEmail),
+    });
+
+    console.log("Confirmation email status:", confirmResponse.status);
+
+    if (confirmResponse.status !== 202 && confirmResponse.status !== 200) {
+      const errorData = await confirmResponse.text();
+      console.error("SendGrid Error:", errorData);
+      throw new Error(`Failed to send confirmation email: ${confirmResponse.status}`);
+    }
+
+    // Step 2: Process message with Gemini AI (async, don't block response)
+    (async () => {
+      try {
+        console.log("Processing message with Gemini AI...");
+
+        // Create prompt for Gemini
+        const prompt = `You are a helpful customer support assistant for SmartCal, a smart calorie tracking and nutrition app. 
+
+A user named ${name} has sent the following message:
+"${message}"
+
+Please provide a helpful, friendly, and professional response addressing their inquiry. Include relevant information about SmartCal's features if applicable:
+- Calorie tracking with AI-powered food recognition
+- Personalized nutrition recommendations
+- Meal planning and recipe suggestions
+- Water intake tracking
+- Fitness goal setting
+- Progress tracking with charts and analytics
+
+Keep the response concise (3-5 paragraphs), warm, and helpful. Sign off as "The SmartCal Support Team".`;
+
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const aiResponse = response.text();
+
+        console.log("AI Response generated, sending follow-up email...");
+
+        // Step 3: Send AI-generated response email
+        const responseBody = `Hi ${name},
+
+${aiResponse}
+
+If you have any other questions or need further assistance, feel free to reply to this email!
+
+Best regards,
+The SmartCal Support Team`;
+
+        const responseEmail = {
+          personalizations: [
+            {
+              to: [{ email: email, name: name }],
+              subject: "Re: Your SmartCal Inquiry - AI Response",
+            },
+          ],
+          from: {
+            email: "jaykinchan@gmail.com",
+            name: "SmartCal Team",
+          },
+          content: [
+            {
+              type: "text/plain",
+              value: responseBody,
+            },
+          ],
+        };
+
+        const aiEmailResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${SENDGRID_API_KEY}`,
+          },
+          body: JSON.stringify(responseEmail),
+        });
+
+        if (aiEmailResponse.status === 202 || aiEmailResponse.status === 200) {
+          console.log("AI response email sent successfully to:", email);
+        } else {
+          console.error("Failed to send AI response email:", aiEmailResponse.status);
+        }
+      } catch (error) {
+        console.error("Error processing AI response:", error);
+      }
+    })();
+
+    // Return success immediately after confirmation email
+    res.json({
+      success: true,
+      message: "Message sent successfully! Check your email for confirmation and an AI-powered response.",
+    });
+  } catch (error) {
+    console.error("Error sending contact email:", error);
+    res.status(500).json({
+      error: "Failed to send message",
+      message: error.message,
+    });
+  }
+});
+
 // Start server (for local development)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
