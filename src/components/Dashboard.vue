@@ -7,133 +7,127 @@
         <p>Track your meals, water, and nutrition today!</p>
       </header>
 
-    <section class="rings">
-      <div class="ring">
-        <h3>Calories Today</h3>
-        <div class="value">{{ totalCalories }} kcal</div>
-      </div>
-      <div class="ring">
-        <h3>Water Today</h3>
-        <div class="value">{{ totalWater }} ml</div>
-      </div>
-    </section>
-
-    <section class="quick-actions">
-      <h2>Quick Actions</h2>
-      <button @click="showMealForm = true">Add Meal</button>
-      <button @click="showWaterForm = true">Add Water</button>
-      <button @click="showNutritionForm = true">Add Nutrition</button>
-      <button @click="$router.push('/meal-planner')">📅 Meal Planner</button>
-    </section>
-
-    <!-- Forms -->
-    <div v-if="showMealForm" class="form-overlay">
-      <div class="form-container">
-        <h3>Add Meal</h3>
-        <input v-model="mealName" placeholder="Meal Name" />
-        <input
-          v-model.number="mealCalories"
-          type="number"
-          placeholder="Calories"
-        />
-        <button @click="addMeal">Submit</button>
-        <button @click="showMealForm = false">Cancel</button>
-      </div>
-    </div>
-
-    <div v-if="showWaterForm" class="form-overlay">
-      <div class="form-container">
-        <h3>Add Water (ml)</h3>
-        <input
-          v-model.number="waterAmount"
-          type="number"
-          placeholder="Amount (ml)"
-        />
-        <button @click="addWater">Submit</button>
-        <button @click="showWaterForm = false">Cancel</button>
-      </div>
-    </div>
-
-    <div v-if="showNutritionForm" class="form-overlay">
-      <div class="form-container">
-        <h3>Add Nutrition</h3>
-        <input
-          v-model.number="nutritionCarbs"
-          type="number"
-          placeholder="Carbs (g)"
-        />
-        <input
-          v-model.number="nutritionProtein"
-          type="number"
-          placeholder="Protein (g)"
-        />
-        <input
-          v-model.number="nutritionFat"
-          type="number"
-          placeholder="Fat (g)"
-        />
-        <button @click="addNutrition">Submit</button>
-        <button @click="showNutritionForm = false">Cancel</button>
-      </div>
-    </div>
-
-    <!-- Nutrition Breakdown -->
-    <section class="nutrition-breakdown">
-      <h2>Nutrition Breakdown Today</h2>
-      <div class="breakdown">
-        <div>Carbs: {{ totalCarbs }} g</div>
-        <div>Protein: {{ totalProtein }} g</div>
-        <div>Fat: {{ totalFat }} g</div>
-      </div>
-
-      <NutritionPieChart
-        v-if="dataFetched"
-        :carbs="totalCarbs"
-        :protein="totalProtein"
-        :fat="totalFat"
-      />
-    </section>
-
-    <!-- AI Recommendations -->
-    <section class="recommendations-section">
-      <h2>AI Nutrition Recommendations</h2>
-      <p class="recommendations-subtitle">
-        Get personalized advice based on your daily intake
-      </p>
-      <div class="rec-controls">
-        <button @click="getRecommendation" :disabled="loading || !dataFetched">
-          {{ loading ? "Analyzing..." : "Get Daily Recommendation" }}
-        </button>
-        <button @click="clearRecommendation" v-if="recommendation || error">
-          Clear
-        </button>
-      </div>
-      <div class="rec-output" v-if="recommendation || error">
-        <div v-if="recommendation" class="recommendation-text">
-          <strong>💡 Recommendation:</strong>
-          <p>{{ recommendation }}</p>
+      <!-- Daily Summary Rings -->
+      <section class="rings">
+        <div class="ring">
+          <h3>Calories Today</h3>
+          <div class="value">{{ totalCalories }} kcal</div>
         </div>
-        <p v-if="error" class="error-text">{{ error }}</p>
+        <div class="ring">
+          <h3>Water Today</h3>
+          <div class="value">{{ totalWater }} ml</div>
+        </div>
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="quick-actions">
+        <h2>Quick Actions</h2>
+        <button @click="showMealForm = true">Add Meal</button>
+        <button @click="showWaterForm = true">Add Water</button>
+        <button @click="showNutritionForm = true">Add Nutrition</button>
+        <button @click="$router.push('/meal-planner')">📅 Meal Planner</button>
+        <!-- Reset Buttons -->
+        <button @click="resetDailyCalories" class="reset-btn">Reset Daily Calories</button>
+        
+      </section>
+
+      <!-- Forms -->
+      <div v-if="showMealForm" class="form-overlay">
+        <div class="form-container">
+          <h3>Add Meal</h3>
+          <input v-model="mealName" placeholder="Meal Name" />
+          <input v-model.number="mealCalories" type="number" placeholder="Calories" />
+          <button @click="addMeal">Submit</button>
+          <button @click="showMealForm = false">Cancel</button>
+        </div>
       </div>
-    </section>
+
+      <div v-if="showWaterForm" class="form-overlay">
+        <div class="form-container">
+          <h3>Add Water (ml)</h3>
+          <input v-model.number="waterAmount" type="number" placeholder="Amount (ml)" />
+          <button @click="addWater">Submit</button>
+          <button @click="showWaterForm = false">Cancel</button>
+        </div>
+      </div>
+
+      <div v-if="showNutritionForm" class="form-overlay">
+        <div class="form-container">
+          <h3>Add Nutrition</h3>
+          <input v-model.number="nutritionCarbs" type="number" placeholder="Carbs (g)" />
+          <input v-model.number="nutritionProtein" type="number" placeholder="Protein (g)" />
+          <input v-model.number="nutritionFat" type="number" placeholder="Fat (g)" />
+          <button @click="addNutrition">Submit</button>
+          <button @click="showNutritionForm = false">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Nutrition Breakdown -->
+      <section class="nutrition-breakdown">
+        <h2>Nutrition Breakdown Today</h2>
+        <div class="breakdown">
+          <div>Carbs: {{ totalCarbs }} g</div>
+          <div>Protein: {{ totalProtein }} g</div>
+          <div>Fat: {{ totalFat }} g</div>
+        </div>
+
+        <!-- Pie Chart -->
+        <NutritionPieChart
+          v-if="dataFetched"
+          :carbs="totalCarbs"
+          :protein="totalProtein"
+          :fat="totalFat"
+        />
+
+        <div class="charts-container" v-if="dataFetched">
+          <!-- Calories Line Chart -->
+          <CaloriesLineChart
+            v-if="weeklyCalories.length && dataFetched"
+            :data="weeklyCalories"
+            />
+          
+        </div>
+      </section>
+
+      
+      <!-- AI Recommendations -->
+      <section class="recommendations-section">
+        <h2>AI Nutrition Recommendations</h2>
+        <p class="recommendations-subtitle">
+          Get personalized advice based on your daily intake
+        </p>
+        <div class="rec-controls">
+          <button @click="getRecommendation" :disabled="loading || !dataFetched">
+            {{ loading ? "Analyzing..." : "Get Daily Recommendation" }}
+          </button>
+          <button @click="clearRecommendation" v-if="recommendation || error">
+            Clear
+          </button>
+        </div>
+        <div class="rec-output" v-if="recommendation || error">
+          <div v-if="recommendation" class="recommendation-text">
+            <strong>💡 Recommendation:</strong>
+            <p>{{ recommendation }}</p>
+          </div>
+          <p v-if="error" class="error-text">{{ error }}</p>
+        </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watchEffect, onMounted } from "vue";
+import { ref, watchEffect } from "vue";
 import { supabase } from "@/supabase";
 import { userState } from "@/state/userState";
-import NutritionPieChart from "@/components/NutritionPieChart.vue";
 import Navbar from "@/components/Navbar.vue";
-import { useRouter } from "vue-router";
+import NutritionPieChart from "@/components/NutritionPieChart.vue";
+import CaloriesLineChart from "@/components/CaloriesLineChart.vue";
+import WaterBarChart from "./WaterBarChart.vue";
 
-const router = useRouter();
-
-// User
 const user = userState.user;
 
-// Totals
+// Daily totals
 const totalCalories = ref(0);
 const totalWater = ref(0);
 const totalCarbs = ref(0);
@@ -141,20 +135,13 @@ const totalProtein = ref(0);
 const totalFat = ref(0);
 const dataFetched = ref(false);
 
-// AI Recommendations
-const recommendation = ref(null);
-const loading = ref(false);
-const error = ref(null);
+// Weekly calories chart
+const weeklyCalories = ref([]);
 
-// Backend API URL - use relative path for Vercel, absolute for local dev
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '' : 'http://localhost:3000');
-
-// Form visibility
+// Forms
 const showMealForm = ref(false);
 const showWaterForm = ref(false);
 const showNutritionForm = ref(false);
-
-// Form inputs
 const mealName = ref("");
 const mealCalories = ref(null);
 const waterAmount = ref(null);
@@ -164,25 +151,24 @@ const nutritionFat = ref(null);
 
 // Get today's date
 function getToday() {
-  const now = new Date();
-  return now.toISOString().split("T")[0];
+  return new Date().toISOString().split("T")[0];
 }
 
-// Fetch data from Supabase
+// Fetch daily totals
 async function fetchData() {
   if (!user) return;
 
   const today = getToday();
 
-  // Fetch meals
+  // Meals
   const { data: meals } = await supabase
     .from("meals")
     .select("*")
     .eq("user_id", user.id)
     .gte("date", today);
-  const mealCalories = meals?.reduce((sum, m) => sum + m.calories, 0) || 0;
+  const mealCal = meals?.reduce((sum, m) => sum + m.calories, 0) || 0;
 
-  // Fetch water
+  // Water
   const { data: water } = await supabase
     .from("water_logs")
     .select("*")
@@ -190,32 +176,55 @@ async function fetchData() {
     .gte("date", today);
   totalWater.value = water?.reduce((sum, w) => sum + w.amount, 0) || 0;
 
-  // Fetch nutrition
+  // Nutrition
   const { data: nutrition } = await supabase
     .from("nutrition")
     .select("*")
     .eq("user_id", user.id)
     .gte("date", today);
-  const nutritionCalories =
-    nutrition?.reduce((sum, n) => sum + n.calories, 0) || 0;
+  const nutritionCal = nutrition?.reduce((sum, n) => sum + n.calories, 0) || 0;
   totalCarbs.value = nutrition?.reduce((sum, n) => sum + n.carbs, 0) || 0;
   totalProtein.value = nutrition?.reduce((sum, n) => sum + n.protein, 0) || 0;
   totalFat.value = nutrition?.reduce((sum, n) => sum + n.fat, 0) || 0;
 
-  // Total calories = meals + nutrition
-  totalCalories.value = mealCalories + nutritionCalories;
-
+  totalCalories.value = mealCal + nutritionCal;
   dataFetched.value = true;
+
+  await fetchWeeklyCalories();
+}
+
+// Fetch weekly calories for chart
+async function fetchWeeklyCalories() {
+  if (!user) return;
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 6);
+  const formattedStart = startDate.toISOString().split("T")[0];
+
+  const { data: meals } = await supabase
+    .from("meals")
+    .select("date, calories")
+    .eq("user_id", user.id)
+    .gte("date", formattedStart);
+
+  const dailyCalories = {};
+  for (let i = 0; i < 7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    dailyCalories[d.toISOString().split("T")[0]] = 0;
+  }
+
+  meals?.forEach(m => {
+    dailyCalories[m.date] = (dailyCalories[m.date] || 0) + m.calories;
+  });
+
+  weeklyCalories.value = Object.entries(dailyCalories).map(([date, value]) => ({ date, value }));
 }
 
 // Add entries
 async function addMeal() {
   if (!mealName.value || !mealCalories.value) return;
-  await supabase
-    .from("meals")
-    .insert([
-      { user_id: user.id, name: mealName.value, calories: mealCalories.value },
-    ]);
+  await supabase.from("meals").insert([{ user_id: user.id, name: mealName.value, calories: mealCalories.value }]);
   mealName.value = "";
   mealCalories.value = null;
   showMealForm.value = false;
@@ -224,30 +233,22 @@ async function addMeal() {
 
 async function addWater() {
   if (!waterAmount.value) return;
-  await supabase
-    .from("water_logs")
-    .insert([{ user_id: user.id, amount: waterAmount.value }]);
+  await supabase.from("water_logs").insert([{ user_id: user.id, amount: waterAmount.value }]);
   waterAmount.value = null;
   showWaterForm.value = false;
   fetchData();
 }
 
 async function addNutrition() {
-  if (!nutritionCarbs.value && !nutritionProtein.value && !nutritionFat.value)
-    return;
-  const calories =
-    (nutritionCarbs.value || 0) * 4 +
-    (nutritionProtein.value || 0) * 4 +
-    (nutritionFat.value || 0) * 9;
-  await supabase.from("nutrition").insert([
-    {
-      user_id: user.id,
-      carbs: nutritionCarbs.value || 0,
-      protein: nutritionProtein.value || 0,
-      fat: nutritionFat.value || 0,
-      calories,
-    },
-  ]);
+  if (!nutritionCarbs.value && !nutritionProtein.value && !nutritionFat.value) return;
+  const calories = (nutritionCarbs.value || 0) * 4 + (nutritionProtein.value || 0) * 4 + (nutritionFat.value || 0) * 9;
+  await supabase.from("nutrition").insert([{
+    user_id: user.id,
+    carbs: nutritionCarbs.value || 0,
+    protein: nutritionProtein.value || 0,
+    fat: nutritionFat.value || 0,
+    calories
+  }]);
   nutritionCarbs.value = null;
   nutritionProtein.value = null;
   nutritionFat.value = null;
@@ -255,32 +256,49 @@ async function addNutrition() {
   fetchData();
 }
 
-// AI Recommendation
+// Reset Daily Calories (today's meals + nutrition)
+async function resetDailyCalories() {
+  if (!user) return;
+  const today = getToday();
+
+  await supabase.from("meals").delete().eq("user_id", user.id).gte("date", today);
+  await supabase.from("nutrition").delete().eq("user_id", user.id).gte("date", today);
+
+  totalCalories.value = 0;
+  totalCarbs.value = 0;
+  totalProtein.value = 0;
+  totalFat.value = 0;
+}
+
+// Reset Weekly Chart (last 7 days meals)
+async function resetWeeklyChart() {
+  if (!user) return;
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 6);
+  const formattedStart = startDate.toISOString().split("T")[0];
+
+  await supabase.from("meals").delete().eq("user_id", user.id).gte("date", formattedStart);
+
+  weeklyCalories.value = [];
+}
+
+const recommendation = ref(null);
+const loading = ref(false);
+const error = ref(null);
+
 async function getRecommendation() {
   loading.value = true;
   error.value = null;
   recommendation.value = null;
 
-  const today = getToday();
-
   try {
-    // Fetch all data from today for more detailed recommendations
+    const today = getToday();
+
+    // Fetch daily meals, water, nutrition
     const [mealsRes, waterRes, nutritionRes] = await Promise.all([
-      supabase
-        .from("meals")
-        .select("*")
-        .eq("user_id", user.id)
-        .gte("date", today),
-      supabase
-        .from("water_logs")
-        .select("*")
-        .eq("user_id", user.id)
-        .gte("date", today),
-      supabase
-        .from("nutrition")
-        .select("*")
-        .eq("user_id", user.id)
-        .gte("date", today),
+      supabase.from("meals").select("*").eq("user_id", user.id).gte("date", today),
+      supabase.from("water_logs").select("*").eq("user_id", user.id).gte("date", today),
+      supabase.from("nutrition").select("*").eq("user_id", user.id).gte("date", today)
     ]);
 
     const summary = {
@@ -289,34 +307,25 @@ async function getRecommendation() {
         water: totalWater.value,
         carbs: totalCarbs.value,
         protein: totalProtein.value,
-        fat: totalFat.value,
+        fat: totalFat.value
       },
       meals: mealsRes.data || [],
       waterLogs: waterRes.data || [],
-      nutritionEntries: nutritionRes.data || [],
+      nutritionEntries: nutritionRes.data || []
     };
 
-    const response = await fetch(`${API_URL}/api/recommendation`, {
+    // Call your backend API for AI recommendation
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/recommendation`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ summary }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ summary })
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('API Error Response:', errorData);
-      throw new Error(errorData.message || errorData.error || "Failed to get recommendation");
-    }
-
+    if (!response.ok) throw new Error("Failed to get recommendation");
     const data = await response.json();
     recommendation.value = data.recommendation;
   } catch (err) {
-    console.error("Recommendation error:", err);
-    error.value =
-      err.message ||
-      "Failed to get recommendation. Make sure the server is running.";
+    error.value = err.message || "Failed to fetch recommendation";
   } finally {
     loading.value = false;
   }
@@ -327,11 +336,9 @@ function clearRecommendation() {
   error.value = null;
 }
 
-// Fetch data on mount
+// Fetch on mount
 watchEffect(() => {
-  if (user) {
-    fetchData();
-  }
+  if (user) fetchData();
 });
 </script>
 
@@ -383,13 +390,19 @@ watchEffect(() => {
 .quick-actions button:hover {
   background: #4178c7;
 }
+.quick-actions .reset-btn {
+  background: #e74c3c;
+}
+.quick-actions .reset-btn:hover {
+  background: #c0392b;
+}
 .form-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0,0,0,0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -431,11 +444,7 @@ watchEffect(() => {
   border-radius: 20px;
   color: white;
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-}
-
-.recommendations-section h2 {
-  margin-bottom: 0.5rem;
-  font-size: 1.8rem;
+  text-align: center;
 }
 
 .recommendations-subtitle {
@@ -458,7 +467,6 @@ watchEffect(() => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.95rem;
 }
 
 .rec-controls button:first-child {
