@@ -233,6 +233,13 @@ body {
   color: #2c3e50;
 }
 
+.home-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 /* HERO SECTION */
 .hero {
   display: flex;
@@ -246,6 +253,7 @@ body {
 .hero-content {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 40px;
   max-width: 1100px;
   width: 100%;
@@ -254,6 +262,10 @@ body {
 
 .hero-text {
   text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .hero-text h1 {
@@ -263,10 +275,12 @@ body {
 }
 
 .hero-text p {
-  margin: 15px 0 30px;
+  margin: 15px auto 30px;
   font-size: 1.1rem;
   color: #555;
   line-height: 1.6;
+  max-width: 700px;
+  text-align: center;
 }
 
 .button-group {
@@ -313,6 +327,9 @@ body {
 .hero-img {
   display: flex;
   justify-content: center;
+  width: 100%;
+  max-width: 600px;
+  min-height: 400px;
 }
 
 .hero-image {
@@ -754,6 +771,10 @@ body {
   .fitness-btn {
     width: 100%;
     max-width: 300px;
+  }
+
+  .hero-img {
+    min-height: 300px;
   }
 
   .features,
