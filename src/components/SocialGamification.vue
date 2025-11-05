@@ -1,13 +1,14 @@
 <template>
-  <div class="gamification-dashboard-page">
+  <div>
     <Navbar />
-
-    <div class="dashboard">
-      <header class="dashboard-header">
-        <h1>🏆 Gamification Dashboard</h1>
-        <p>Track your achievements, points, and challenges</p>
-        <button @click="refreshAllData" class="refresh-btn">🔄 Refresh Stats</button>
-      </header>
+    
+    <div class="gamification-dashboard-page">
+      <div class="dashboard">
+        <header class="dashboard-header">
+          <h1>🏆 Gamification Dashboard</h1>
+          <p>Track your achievements, points, and challenges</p>
+          <button @click="refreshAllData" class="refresh-btn">🔄 Refresh Stats</button>
+        </header>
 
       <!-- Tabs -->
       <div class="tabs">
@@ -195,6 +196,7 @@
         <button @click="closeAchievementView" class="close-btn">Close</button>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -709,7 +711,7 @@ onMounted(async () => {
 .gamification-dashboard-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-  padding: 2rem;
+  padding: 2rem 2rem 2rem 2rem;
   font-family: "Poppins", sans-serif;
 }
 .dashboard {
@@ -1004,5 +1006,188 @@ onMounted(async () => {
 }
 .chart-section h3 {
   color: #2c3e50;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+  .gamification-dashboard-page {
+    padding: 1.5rem;
+  }
+
+  .dashboard {
+    max-width: 100%;
+  }
+
+  .overview-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .overview-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .challenges-grid,
+  .achievements-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .gamification-dashboard-page {
+    padding: 1rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .dashboard-header p {
+    font-size: 0.9rem;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .tabs button {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    flex: 1 1 auto;
+    min-width: 120px;
+  }
+
+  .overview-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .card {
+    padding: 1.2rem;
+  }
+
+  .challenges-grid,
+  .achievements-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .challenge-card,
+  .achievement-card {
+    padding: 1.2rem;
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .filter-row select {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .leaderboard-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 450px;
+    padding: 1.5rem;
+  }
+
+  .chart-section {
+    padding: 1rem;
+  }
+
+  .refresh-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .gamification-dashboard-page {
+    padding: 0.5rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-header p {
+    font-size: 0.85rem;
+  }
+
+  .tabs button {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+    min-width: 100px;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .card p {
+    font-size: 1.3rem;
+  }
+
+  .challenge-card h3,
+  .achievement-card h3 {
+    font-size: 1rem;
+  }
+
+  .challenge-card p,
+  .achievement-card p {
+    font-size: 0.85rem;
+  }
+
+  .category-badge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .progress-text,
+  .status {
+    font-size: 0.8rem;
+  }
+
+  .reward-section {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .reward-points,
+  .reward-xp {
+    font-size: 0.8rem;
+  }
+
+  .leaderboard-item span {
+    font-size: 0.85rem;
+  }
+
+  .modal-content {
+    padding: 1rem;
+  }
+
+  .modal-content h2 {
+    font-size: 1.3rem;
+  }
+
+  .close-btn,
+  .complete-btn {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
 }
 </style>

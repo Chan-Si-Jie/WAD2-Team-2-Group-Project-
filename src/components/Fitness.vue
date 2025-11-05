@@ -1,10 +1,14 @@
 <template>
-  <div class="fitness-page">
-    <!-- Animated Header -->
-    <div class="header-section">
-      <h1 class="main-title">
-        <span class="emoji-float">🏋️‍♂️</span>
-        Fitness Tracker
+  <div>
+    <!-- Navbar -->
+    <Navbar />
+    
+    <div class="fitness-page">
+      <!-- Animated Header -->
+      <div class="header-section">
+        <h1 class="main-title">
+          <span class="emoji-float">🏋️‍♂️</span>
+          Fitness Tracker
         <span class="emoji-float">💪</span>
       </h1>
       <div class="header-glow"></div>
@@ -189,6 +193,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -196,6 +201,7 @@ import { ref, onMounted, computed } from "vue";
 import ApexChart from "vue3-apexcharts";
 import { supabase } from "@/supabase";
 import { userState } from "@/state/userState";
+import Navbar from "@/components/Navbar.vue";
 
 const dailyGoal = ref(2000);
 const weeklyGoal = ref(5);
@@ -280,12 +286,13 @@ const loadData = async () => {
   if (!userState.user) return;
   const userId = userState.user.id;
 
-  const { data: goalData } = await supabase
+  const { data: goalData, error: goalError } = await supabase
     .from("fitness_goals")
     .select("*")
     .eq("user_id", userId)
-    .single();
-  if (goalData) {
+    .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 error when no data exists
+    
+  if (goalData && !goalError) {
     dailyGoal.value = goalData.daily_calorie_goal;
     weeklyGoal.value = goalData.weekly_workout_goal;
   }
@@ -438,14 +445,8 @@ onMounted(() => loadData());
 </script>
 
 <style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 .fitness-page {
-  padding: 2rem;
+  padding: 2rem 2rem 2rem 2rem;
   font-family: "Inter", "Poppins", sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
@@ -1286,7 +1287,30 @@ onMounted(() => loadData());
   }
 }
 
-/* Responsive Design */
+/* RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+  .fitness-page {
+    padding: 1.5rem;
+  }
+
+  .main-content {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .goal-cards {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .bar-chart-section,
+  .workouts-section {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .fitness-page {
     padding: 1rem;
@@ -1294,6 +1318,14 @@ onMounted(() => loadData());
 
   .main-title {
     font-size: 2.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
   }
 
   .goal-cards {
@@ -1309,6 +1341,7 @@ onMounted(() => loadData());
   .log-card {
     flex-direction: column;
     align-items: stretch;
+    padding: 1.5rem;
   }
 
   .input-group {
@@ -1319,9 +1352,14 @@ onMounted(() => loadData());
     width: 100%;
   }
 
+  .history-list {
+    gap: 1rem;
+  }
+
   .history-card {
     flex-direction: column;
     text-align: center;
+    padding: 1.5rem;
   }
 
   .card-badge {
@@ -1332,6 +1370,7 @@ onMounted(() => loadData());
   .history-header {
     flex-direction: column;
     gap: 0.5rem;
+    text-align: center;
   }
 
   .history-details {
@@ -1342,6 +1381,103 @@ onMounted(() => loadData());
   .mini-chart {
     margin-left: 0;
     margin-top: 1rem;
+  }
+
+  .chart-container {
+    padding: 1rem;
+  }
+
+  .save-btn {
+    padding: 0.9rem 1.8rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .fitness-page {
+    padding: 0.75rem;
+  }
+
+  .main-title {
+    font-size: 2rem;
+  }
+
+  .emoji-float {
+    font-size: 1.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .login-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .login-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .login-card p {
+    font-size: 0.9rem;
+  }
+
+  .goal-card {
+    padding: 1.5rem;
+  }
+
+  .goal-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .input-wrapper input {
+    font-size: 1.5rem;
+    padding: 0.6rem;
+  }
+
+  .log-card {
+    padding: 1.2rem;
+  }
+
+  .log-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .input-group input,
+  .input-group select {
+    font-size: 0.9rem;
+    padding: 0.7rem;
+  }
+
+  .add-btn {
+    padding: 0.7rem;
+    font-size: 0.9rem;
+  }
+
+  .history-card {
+    padding: 1.2rem;
+  }
+
+  .history-header h3 {
+    font-size: 1rem;
+  }
+
+  .history-stat {
+    font-size: 0.8rem;
+  }
+
+  .delete-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .save-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .chart-container {
+    padding: 0.75rem;
   }
 }
 

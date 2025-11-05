@@ -1,11 +1,14 @@
 <template>
-  <div class="profile-page">
-    <!-- Back Button -->
-    <div class="back-button" @click="goHome">
-      <img :src="backArrow" alt="Back" />
-    </div>
+  <div>
+    <Navbar />
+    
+    <div class="profile-page">
+      <!-- Back Button -->
+      <div class="back-button" @click="goHome">
+        <img :src="backArrow" alt="Back" />
+      </div>
 
-    <div class="profile-container" v-if="userState.loggedIn">
+      <div class="profile-container" v-if="userState.loggedIn">
       <!-- Profile Picture -->
       <div class="profile-pic">
         <img :src="profilePic || defaultPic" alt="Profile Picture" />
@@ -76,6 +79,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -83,6 +87,7 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "@/supabase";
 import { userState } from "@/state/userState";
+import Navbar from "@/components/Navbar.vue";
 import backArrow from "@/assets/back-arrow.png";
 import defaultPic from "@/assets/default-profile.png";
 
@@ -241,7 +246,7 @@ const memberSince = computed(() => {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 80px;
+  padding: 2rem 0 80px 0;
   font-family: "Poppins", sans-serif;
 }
 .back-button {
@@ -408,5 +413,86 @@ const memberSince = computed(() => {
   border: none;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .profile-page {
+    padding-top: 60px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .back-button {
+    top: 15px;
+    left: 15px;
+    width: 35px;
+    height: 35px;
+  }
+
+  .profile-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem 1.5rem;
+  }
+
+  .modal-content {
+    width: 90%;
+    max-width: 400px;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-page {
+    padding-top: 50px;
+  }
+
+  .back-button {
+    top: 10px;
+    left: 10px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .profile-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .profile-container h2 {
+    font-size: 1.3rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .profile-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    margin: 0;
+    width: 100%;
+  }
+
+  .modal-content {
+    padding: 1rem;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .modal-buttons button {
+    margin: 0;
+    width: 100%;
+  }
 }
 </style>
