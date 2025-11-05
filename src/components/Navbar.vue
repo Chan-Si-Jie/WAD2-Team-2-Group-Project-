@@ -9,7 +9,7 @@ const route = useRoute();
 const mobileMenu = ref(false);
 
 // Check if user is on homepage
-const isHomePage = computed(() => route.path === '/');
+const isHomePage = computed(() => route.path === "/");
 
 const toggleMenu = () => {
   mobileMenu.value = !mobileMenu.value;
@@ -42,12 +42,27 @@ const logout = async () => {
 
         <!-- Navigation Links -->
         <ul :class="['nav-links', { active: mobileMenu }]">
-          <li><a @click.prevent="router.push(userState.loggedIn ? '/dashboard' : '/')">Home</a></li>
+          <li>
+            <a
+              @click.prevent="
+                router.push(userState.loggedIn ? '/dashboard' : '/')
+              "
+              >Home</a
+            >
+          </li>
 
           <!-- Only show these on homepage -->
           <li v-if="isHomePage"><a href="#features">Features</a></li>
           <li v-if="isHomePage"><a href="#about">About</a></li>
           <li v-if="isHomePage"><a href="#contact">Contact</a></li>
+
+          <li v-if="userState.loggedIn">
+            <a @click.prevent="router.push('/dashboard')">Dashboard</a>
+          </li>
+
+          <li v-if="userState.loggedIn">
+            <a @click.prevent="router.push('/fitness')">Fitness Tracker</a>
+          </li>
 
           <!-- Meal Planner Link (only for logged in users) -->
           <li v-if="userState.loggedIn">
@@ -61,10 +76,14 @@ const logout = async () => {
 
           <!-- Dynamic Login/Profile -->
           <li v-if="!userState.loggedIn">
-            <button class="login-btn" @click="router.push('/login')">Login</button>
+            <button class="login-btn" @click="router.push('/login')">
+              Login
+            </button>
           </li>
           <li v-else class="profile-container">
-            <button class="login-btn" @click="router.push('/profile')">Profile</button>
+            <button class="login-btn" @click="router.push('/profile')">
+              Profile
+            </button>
             <button class="login-btn logout-btn" @click="logout">Logout</button>
           </li>
         </ul>
