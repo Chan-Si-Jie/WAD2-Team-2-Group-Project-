@@ -390,9 +390,8 @@ const fetchChallenges = async () => {
       ? Math.min(100, Math.round((userProgress.current_progress / challenge.target_value) * 100))
       : 0;
 
-    // Calculate reward based on challenge type (since reward_points doesn't exist)
-    const rewardPoints = challenge.challenge_type === 'daily' ? 50 : 
-                        challenge.challenge_type === 'weekly' ? 100 : 150;
+    // Use reward_points from database
+    const rewardPoints = challenge.reward_points || 100;
 
     return {
       id: challenge.id,
@@ -407,73 +406,92 @@ const fetchChallenges = async () => {
       targetValue: challenge.target_value
     };
   });
+};
+
+// Function to manually check and update challenges
+const checkAndUpdateChallenges = async () => {
+  if (!userState.user?.id) return;
+  
+  try {
+    // Call the database function to check challenges
+    const { error } = await supabase.rpc('check_and_update_challenges', {
+      p_user_id: userState.user.id
+    });
+    
+    if (error) {
+      console.error('Error checking challenges:', error);
+    } else {
+      // Refresh challenges to show updated progress
+      await fetchChallenges();
+    }
+  } catch (err) {
+    console.error('Failed to check challenges:', err);
+  }
+
 
   console.log('✅ Challenges loaded:', challenges.value.length);
 };
 
 // Fetch leaderboard
 const fetchLeaderboard = async () => {
-  // First, get all users who have stats (without level column that may not exist)
+  // Get all users with stats, sorted by total_points
   const { data: statsData, error: statsError } = await supabase
     .from('user_stats')
-    .select('user_id, total_points, current_streak')
+    .select('user_id, total_points, current_streak, total_meals')
     .order('total_points', { ascending: false })
-    .limit(50);
+    .limit(20);
 
   if (statsError) {
     console.error('Error fetching leaderboard stats:', statsError);
+    // Fallback: create leaderboard with just current user if query fails
+    if (userState.user?.id) {
+      leaderboard.value = [{
+        id: userState.user.id,
+        name: 'You',
+        points: userPoints.value || 0,
+        level: userLevel.value || 1,
+        streak: dailyStreak.value || 0,
+        rank: 1
+      }];
+    } else {
+      leaderboard.value = [];
+    }
+    return;
   }
 
-  // Get all registered users from auth.users table via a custom query
-  // Since we can't directly query auth.users, we'll use the users who logged meals
-  const { data: usersData, error: usersError } = await supabase
-    .from('planned_meals')
-    .select('user_id')
-    .limit(100);
-
-  if (usersError) {
-    console.error('Error fetching users:', usersError);
+  if (!statsData || statsData.length === 0) {
+    console.log('No user stats found in database');
+    // If no stats, show current user with 0 points
+    if (userState.user?.id) {
+      leaderboard.value = [{
+        id: userState.user.id,
+        name: 'You',
+        points: 0,
+        level: 1,
+        streak: 0,
+        rank: 1
+      }];
+    } else {
+      leaderboard.value = [];
+    }
+    return;
   }
 
-  // Create a Set of all unique user IDs
-  const allUserIds = new Set();
-  
-  // Add users from stats
-  statsData?.forEach(stat => allUserIds.add(stat.user_id));
-  
-  // Add users from planned_meals (users who have logged meals)
-  usersData?.forEach(meal => allUserIds.add(meal.user_id));
-  
-  // Add current user
-  if (userState.user?.id) {
-    allUserIds.add(userState.user.id);
-  }
-
-  // Create a map of user stats
-  const statsMap = new Map(
-    statsData?.map(stat => [stat.user_id, stat]) || []
-  );
-
-  // Build leaderboard with all users
-  const leaderboardData = Array.from(allUserIds).map(userId => {
-    const stats = statsMap.get(userId);
+  // Build leaderboard with actual stats
+  leaderboard.value = statsData.map((entry, index) => {
+    const points = entry.total_points || 0;
+    // Calculate level from points (100 points = level 1, 200 = level 2, etc.)
+    const calculatedLevel = Math.floor(points / 100) + 1;
+    
     return {
-      id: userId,
-      name: userId === userState.user?.id ? 'You' : `Player`,
-      points: stats?.total_points || 0,
-      level: userLevel.value || 1, // Use computed level from state
-      streak: stats?.current_streak || 0
+      id: entry.user_id,
+      name: entry.user_id === userState.user?.id ? 'You' : `Player ${index + 2}`,
+      points: points,
+      level: calculatedLevel,
+      streak: entry.current_streak || 0,
+      rank: index + 1
     };
   });
-
-  // Sort by points (descending) and assign ranks
-  leaderboardData.sort((a, b) => b.points - a.points);
-  
-  leaderboard.value = leaderboardData.slice(0, 20).map((entry, index) => ({
-    ...entry,
-    rank: index + 1,
-    name: entry.id === userState.user?.id ? 'You' : `Player ${index + 1}`
-  }));
 
   console.log('✅ Leaderboard loaded:', leaderboard.value.length, 'players');
 };
@@ -604,7 +622,11 @@ const refreshAllData = async () => {
   console.log('🔄 Refreshing all data...');
   await fetchUserStats();
   await fetchAchievements();
+  
+  // Check and update challenges before fetching
+  await checkAndUpdateChallenges();
   await fetchChallenges();
+  
   await fetchLeaderboard();
   
   // Check for new achievements after fetching data
