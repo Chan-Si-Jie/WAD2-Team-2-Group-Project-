@@ -7,27 +7,27 @@
         <p>Track your meals, water, and nutrition today!</p>
       </header>
 
-    <section class="rings">
-      <div class="ring">
-        <h3>Calories Today</h3>
-        <div class="value">{{ totalCalories }} kcal</div>
-      </div>
-      <div class="ring">
-        <h3>Water Today</h3>
-        <div class="value">{{ totalWater }} ml</div>
-      </div>
-    </section>
+      <section class="rings">
+        <div class="ring">
+          <h3>Calories Today</h3>
+          <div class="value">{{ totalCalories }} kcal</div>
+        </div>
+        <div class="ring">
+          <h3>Water Today</h3>
+          <div class="value">{{ totalWater }} ml</div>
+        </div>
+      </section>
 
-    <section class="quick-actions">
-      <h2>Quick Actions</h2>
-      <button @click="showMealForm = true">Add Meal</button>
-      <button @click="showWaterForm = true">Add Water</button>
-      <button @click="showNutritionForm = true">Add Nutrition</button>
-      <button @click="$router.push('/meal-planner')">📅 Meal Planner</button>
-    </section>
+      <section class="quick-actions">
+        <h2>Quick Actions</h2>
+        <button @click="showMealForm = true">Add Meal</button>
+        <button @click="showWaterForm = true">Add Water</button>
+        <button @click="showNutritionForm = true">Add Nutrition</button>
+        <button @click="$router.push('/meal-planner')">📅 Meal Planner</button>
+      </section>
 
-    <!-- Forms -->
-    <div v-if="showMealForm" class="form-overlay">
+      <!-- Forms -->
+      <div v-if="showMealForm" class="form-overlay">
       <div class="form-container">
         <h3>Add Meal</h3>
         
@@ -103,45 +103,18 @@
         <div class="form-buttons">
           <button @click="addMeal" :disabled="!mealName || !mealCalories">Submit</button>
           <button @click="closeMealForm" class="cancel-btn">Cancel</button>
-      <!-- Daily Summary Rings -->
-      <section class="rings">
-        <div class="ring">
-          <h3>Calories Today</h3>
-          <div class="value">{{ totalCalories }} kcal</div>
-        </div>
-        <div class="ring">
-          <h3>Water Today</h3>
-          <div class="value">{{ totalWater }} ml</div>
-        </div>
-      </section>
-
-      <!-- Quick Actions -->
-      <section class="quick-actions">
-        <h2>Quick Actions</h2>
-        <button @click="showMealForm = true">Add Meal</button>
-        <button @click="showWaterForm = true">Add Water</button>
-        <button @click="showNutritionForm = true">Add Nutrition</button>
-        <button @click="$router.push('/meal-planner')">📅 Meal Planner</button>
-        <!-- Reset Buttons -->
-        <button @click="resetDailyCalories" class="reset-btn">Reset Daily Calories</button>
-        
-      </section>
-
-      <!-- Forms -->
-      <div v-if="showMealForm" class="form-overlay">
-        <div class="form-container">
-          <h3>Add Meal</h3>
-          <input v-model="mealName" placeholder="Meal Name" />
-          <input v-model.number="mealCalories" type="number" placeholder="Calories" />
-          <button @click="addMeal">Submit</button>
-          <button @click="showMealForm = false">Cancel</button>
         </div>
       </div>
+    </div>
 
       <div v-if="showWaterForm" class="form-overlay">
         <div class="form-container">
           <h3>Add Water (ml)</h3>
-          <input v-model.number="waterAmount" type="number" placeholder="Amount (ml)" />
+          <input
+            v-model.number="waterAmount"
+            type="number"
+            placeholder="Amount (ml)"
+          />
           <button @click="addWater">Submit</button>
           <button @click="showWaterForm = false">Cancel</button>
         </div>
@@ -150,9 +123,21 @@
       <div v-if="showNutritionForm" class="form-overlay">
         <div class="form-container">
           <h3>Add Nutrition</h3>
-          <input v-model.number="nutritionCarbs" type="number" placeholder="Carbs (g)" />
-          <input v-model.number="nutritionProtein" type="number" placeholder="Protein (g)" />
-          <input v-model.number="nutritionFat" type="number" placeholder="Fat (g)" />
+          <input
+            v-model.number="nutritionCarbs"
+            type="number"
+            placeholder="Carbs (g)"
+          />
+          <input
+            v-model.number="nutritionProtein"
+            type="number"
+            placeholder="Protein (g)"
+          />
+          <input
+            v-model.number="nutritionFat"
+            type="number"
+            placeholder="Fat (g)"
+          />
           <button @click="addNutrition">Submit</button>
           <button @click="showNutritionForm = false">Cancel</button>
         </div>

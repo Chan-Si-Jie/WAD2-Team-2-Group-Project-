@@ -114,6 +114,60 @@
             </div>
           </div>
         </div>
+
+        <!-- Suggested Recipes Section -->
+        <div class="suggested-recipes-section">
+          <div class="suggested-header">
+            <h2>🌟 Suggested Recipes</h2>
+            <div class="search-controls">
+              <input 
+                v-model="recipeSearchQuery" 
+                @keyup.enter="searchSuggestedRecipes"
+                placeholder="Search recipes (e.g., pasta, chicken, vegan)"
+                class="recipe-search-input"
+              />
+              <button @click="searchSuggestedRecipes" class="search-btn">
+                Search
+              </button>
+              <button @click="getRandomRecipes" class="random-btn">
+                🎲 Random
+              </button>
+            </div>
+          </div>
+
+          <div v-if="loadingSuggested" class="loading-state">
+            <p>🔍 Finding delicious recipes...</p>
+          </div>
+
+          <div v-if="suggestedRecipesError" class="error-state">
+            <p>{{ suggestedRecipesError }}</p>
+          </div>
+
+          <div v-if="!loadingSuggested && suggestedRecipes.length > 0" class="suggested-grid">
+            <div
+              v-for="recipe in suggestedRecipes"
+              :key="recipe.id"
+              class="suggested-recipe-card"
+            >
+              <img :src="recipe.image" :alt="recipe.title" class="recipe-image" />
+              <div class="recipe-content">
+                <h3>{{ recipe.title }}</h3>
+                <div class="recipe-info">
+                  <span>⏱️ {{ recipe.readyInMinutes }} min</span>
+                  <span>👥 {{ recipe.servings }} servings</span>
+                </div>
+                <div class="recipe-actions">
+                  <button @click="viewSuggestedRecipe(recipe)" class="view-details-btn">
+                    View Details
+                  </button>
+                  <button @click="saveSuggestedRecipe(recipe)" class="save-btn">
+                    💾 Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Favorites Tab -->
@@ -350,6 +404,13 @@ const plannedMeals = ref([]);
 const recipes = ref([]);
 const favorites = ref([]);
 const shoppingList = ref([]);
+
+// Suggested Recipes (from API)
+const suggestedRecipes = ref([]);
+const recipeSearchQuery = ref("");
+const loadingSuggested = ref(false);
+const suggestedRecipesError = ref(null);
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 // Modals
 const showMealSelector = ref(false);
@@ -638,7 +699,13 @@ const generateShoppingList = async () => {
     (m) => m.date >= startDate && m.date <= endDate && m.recipe_id
   );
 
-  const recipeIds = [...new Set(mealsThisWeek.map((m) => m.recipe_id))];
+  // Count how many times each recipe appears
+  const recipeCount = {};
+  mealsThisWeek.forEach((meal) => {
+    recipeCount[meal.recipe_id] = (recipeCount[meal.recipe_id] || 0) + 1;
+  });
+
+  const recipeIds = Object.keys(recipeCount);
 
   const { data: recipesData } = await supabase
     .from("recipes")
@@ -647,11 +714,19 @@ const generateShoppingList = async () => {
 
   const ingredientMap = {};
   recipesData?.forEach((recipe) => {
+    const count = recipeCount[recipe.id]; // Get how many times this recipe is used
     recipe.ingredients?.forEach((ing) => {
-      if (ingredientMap[ing.name]) {
-        ingredientMap[ing.name] += parseFloat(ing.amount || 0);
+      const ingredientKey = `${ing.name}|${ing.unit}`; // Use name + unit as key to handle different units separately
+      const amount = parseFloat(ing.amount || 0) * count; // Multiply by count
+      
+      if (ingredientMap[ingredientKey]) {
+        ingredientMap[ingredientKey].amount += amount;
       } else {
-        ingredientMap[ing.name] = parseFloat(ing.amount || 0);
+        ingredientMap[ingredientKey] = {
+          name: ing.name,
+          amount: amount,
+          unit: ing.unit || ""
+        };
       }
     });
   });
@@ -660,9 +735,11 @@ const generateShoppingList = async () => {
   await supabase.from("shopping_list").delete().eq("user_id", user.id);
 
   // Add new items
-  const items = Object.entries(ingredientMap).map(([name, amount]) => ({
+  const items = Object.values(ingredientMap).map((ing) => ({
     user_id: user.id,
-    ingredient: `${amount.toFixed(1)} ${name}`,
+    ingredient: ing.unit 
+      ? `${ing.amount.toFixed(1)} ${ing.unit} ${ing.name}`
+      : `${ing.amount.toFixed(1)} ${ing.name}`,
     checked: false,
   }));
 
@@ -691,11 +768,131 @@ const clearCheckedItems = async () => {
   await fetchShoppingList();
 };
 
+// Suggested Recipes API Functions
+const searchSuggestedRecipes = async () => {
+  if (!recipeSearchQuery.value || recipeSearchQuery.value.length < 2) {
+    suggestedRecipesError.value = "Please enter at least 2 characters to search";
+    return;
+  }
+
+  loadingSuggested.value = true;
+  suggestedRecipesError.value = null;
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/recipes/search?query=${encodeURIComponent(recipeSearchQuery.value)}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch recipes");
+    }
+
+    const data = await response.json();
+    suggestedRecipes.value = data.recipes || [];
+  } catch (error) {
+    console.error("Error fetching suggested recipes:", error);
+    suggestedRecipesError.value = "Failed to load recipes. Please try again.";
+  } finally {
+    loadingSuggested.value = false;
+  }
+};
+
+const getRandomRecipes = async () => {
+  loadingSuggested.value = true;
+  suggestedRecipesError.value = null;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/recipes/random`);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch random recipes");
+    }
+
+    const data = await response.json();
+    suggestedRecipes.value = data.recipes || [];
+  } catch (error) {
+    console.error("Error fetching random recipes:", error);
+    suggestedRecipesError.value = "Failed to load recipes. Please try again.";
+  } finally {
+    loadingSuggested.value = false;
+  }
+};
+
+const viewSuggestedRecipe = (recipe) => {
+  // Open recipe details in a new tab
+  window.open(`https://spoonacular.com/recipes/${recipe.title.replace(/\s+/g, '-').toLowerCase()}-${recipe.id}`, '_blank');
+};
+
+const saveSuggestedRecipe = async (apiRecipe) => {
+  try {
+    console.log("Saving recipe:", apiRecipe); // Debug log
+    
+    // We need to fetch full recipe details with nutrition if not already available
+    let recipeWithNutrition = apiRecipe;
+    
+    // Check if nutrition data is missing or incomplete
+    if (!apiRecipe.nutrition || !apiRecipe.nutrition.nutrients || apiRecipe.nutrition.nutrients.length === 0) {
+      console.log("Fetching detailed recipe info for nutrition...");
+      const detailResponse = await fetch(
+        `${API_BASE_URL}/api/recipes/${apiRecipe.id}`
+      );
+      
+      if (detailResponse.ok) {
+        const data = await detailResponse.json();
+        recipeWithNutrition = data.recipe;
+        console.log("Fetched detailed recipe:", recipeWithNutrition);
+      }
+    }
+    
+    // Extract nutrition info
+    const nutrition = recipeWithNutrition.nutrition || {};
+    const nutrients = nutrition.nutrients || [];
+    
+    const calories = nutrients.find(n => n.name === "Calories")?.amount || 0;
+    const protein = nutrients.find(n => n.name === "Protein")?.amount || 0;
+    const carbs = nutrients.find(n => n.name === "Carbohydrates")?.amount || 0;
+    const fat = nutrients.find(n => n.name === "Fat")?.amount || 0;
+
+    // Extract ingredients
+    const ingredients = recipeWithNutrition.extendedIngredients?.map(ing => ({
+      name: ing.name || ing.original,
+      amount: ing.amount || 0,
+      unit: ing.unit || ""
+    })) || [];
+
+    console.log("Extracted nutrition:", { calories, protein, carbs, fat }); // Debug log
+    console.log("Extracted ingredients:", ingredients); // Debug log
+
+    // Save to user's recipes
+    const { error } = await supabase.from("recipes").insert([
+      {
+        user_id: user.id,
+        name: recipeWithNutrition.title,
+        description: `Recipe from Spoonacular - Ready in ${recipeWithNutrition.readyInMinutes} minutes`,
+        total_calories: Math.round(calories),
+        total_protein: Math.round(protein),
+        total_carbs: Math.round(carbs),
+        total_fat: Math.round(fat),
+        ingredients: ingredients
+      }
+    ]);
+
+    if (error) throw error;
+
+    alert("Recipe saved to your recipes!");
+    await fetchRecipes();
+  } catch (error) {
+    console.error("Error saving recipe:", error);
+    alert("Failed to save recipe. Please try again.");
+  }
+};
+
 onMounted(() => {
   fetchPlannedMeals();
   fetchRecipes();
   fetchFavorites();
   fetchShoppingList();
+  getRandomRecipes(); // Load random recipes on mount
 });
 </script>
 
@@ -1519,5 +1716,167 @@ onMounted(() => {
   .modal-content h2 {
     font-size: 1.3rem;
   }
+}
+
+/* Suggested Recipes Styles */
+.suggested-recipes-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e0e0e0;
+}
+
+.suggested-header {
+  margin-bottom: 2rem;
+}
+
+.suggested-header h2 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.search-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.recipe-search-input {
+  flex: 1;
+  min-width: 250px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #27ae60;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.recipe-search-input:focus {
+  outline: none;
+  border-color: #1e874b;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+.search-btn {
+  padding: 0.75rem 1.5rem;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+  background: #1e874b;
+  transform: translateY(-2px);
+}
+
+.random-btn {
+  padding: 0.75rem 1.5rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.random-btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+.loading-state,
+.error-state {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+.error-state {
+  color: #e74c3c;
+}
+
+.suggested-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.suggested-recipe-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.suggested-recipe-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.recipe-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.recipe-content {
+  padding: 1rem;
+}
+
+.recipe-content h3 {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+}
+
+.recipe-info {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.recipe-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.view-details-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-details-btn:hover {
+  background: #2980b9;
+}
+
+.save-btn {
+  padding: 0.5rem 1rem;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  background: #1e874b;
 }
 </style>
