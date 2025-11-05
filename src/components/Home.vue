@@ -14,10 +14,7 @@
           </p>
           <div class="button-group">
             <button @click="$router.push('/dashboard')" class="cta-btn">
-              Dashboard
-            </button>
-            <button @click="$router.push('/fitness')" class="fitness-btn">
-              Go to Fitness Tracker
+              Start your fitness journey!👉
             </button>
           </div>
         </div>
@@ -107,8 +104,9 @@
         <div class="contact-header">
           <h2>Get In Touch</h2>
           <p>
-            Have questions, feedback, or need support? We'd love to hear from you!
-            Reach out through any of the channels below or send us a message directly.
+            Have questions, feedback, or need support? We'd love to hear from
+            you! Reach out through any of the channels below or send us a
+            message directly.
           </p>
         </div>
 
@@ -123,7 +121,7 @@
               <a href="mailto:jaykinchan@gmail.com">jaykinchan@gmail.com</a>
               <p class="info-desc">We'll respond within 24 hours</p>
             </div>
-            
+
             <div class="info-card phone-card">
               <div class="icon-wrapper">
                 <i class="fas fa-phone-alt"></i>
@@ -132,13 +130,13 @@
               <a href="tel:+6598888999">+65 9888 8999</a>
               <p class="info-desc">Mon-Fri, 9AM-6PM SGT</p>
             </div>
-            
+
             <div class="info-card location-card">
               <div class="icon-wrapper">
                 <i class="fas fa-map-marker-alt"></i>
               </div>
               <h4>Visit Us</h4>
-              <p>80 Stamford Rd<br>Singapore 178902</p>
+              <p>80 Stamford Rd<br />Singapore 178902</p>
               <p class="info-desc">Find us at the heart of the city</p>
             </div>
           </div>
@@ -154,47 +152,51 @@
                 <label for="name">
                   <i class="fas fa-user"></i> Your Name
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="name"
                   v-model="contactForm.name"
-                  placeholder="John Doe" 
-                  required 
+                  placeholder="John Doe"
+                  required
                 />
               </div>
-              
+
               <div class="form-group">
                 <label for="email">
                   <i class="fas fa-envelope"></i> Your Email
                 </label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   id="email"
                   v-model="contactForm.email"
-                  placeholder="john@example.com" 
-                  required 
+                  placeholder="john@example.com"
+                  required
                 />
               </div>
-              
+
               <div class="form-group">
                 <label for="message">
                   <i class="fas fa-comment-dots"></i> Your Message
                 </label>
-                <textarea 
+                <textarea
                   id="message"
                   v-model="contactForm.message"
-                  rows="5" 
-                  placeholder="Tell us how we can help you..." 
+                  rows="5"
+                  placeholder="Tell us how we can help you..."
                   required
                 ></textarea>
               </div>
-              
+
               <button type="submit" class="submit-btn" :disabled="sending">
-                <span>{{ sending ? 'Sending...' : 'Send Message' }}</span>
+                <span>{{ sending ? "Sending..." : "Send Message" }}</span>
                 <i class="fas fa-paper-plane"></i>
               </button>
-              
-              <div v-if="submitMessage" class="submit-message" :class="submitSuccess ? 'success' : 'error'">
+
+              <div
+                v-if="submitMessage"
+                class="submit-message"
+                :class="submitSuccess ? 'success' : 'error'"
+              >
                 {{ submitMessage }}
               </div>
             </form>
@@ -222,7 +224,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const contactForm = ref({
   name: "",
   email: "",
-  message: ""
+  message: "",
 });
 
 const sending = ref(false);
@@ -247,17 +249,20 @@ const handleSubmit = async () => {
 
     if (response.ok && data.success) {
       submitSuccess.value = true;
-      submitMessage.value = data.message || "Thank you for your message! We've sent a confirmation email to you.";
-      
+      submitMessage.value =
+        data.message ||
+        "Thank you for your message! We've sent a confirmation email to you.";
+
       // Reset form
       contactForm.value = {
         name: "",
         email: "",
-        message: ""
+        message: "",
       };
     } else {
       submitSuccess.value = false;
-      submitMessage.value = data.error || "Failed to send message. Please try again.";
+      submitMessage.value =
+        data.error || "Failed to send message. Please try again.";
     }
   } catch (error) {
     console.error("Error sending contact form:", error);
@@ -265,7 +270,7 @@ const handleSubmit = async () => {
     submitMessage.value = "An error occurred. Please try again later.";
   } finally {
     sending.value = false;
-    
+
     // Clear message after 5 seconds
     setTimeout(() => {
       submitMessage.value = "";
@@ -537,13 +542,17 @@ body {
 }
 
 .contact::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 1px,
+    transparent 1px
+  );
   background-size: 50px 50px;
   animation: float 20s linear infinite;
 }
@@ -601,7 +610,7 @@ body {
 }
 
 .info-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;

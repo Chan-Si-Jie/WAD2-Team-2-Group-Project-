@@ -28,84 +28,90 @@
 
       <!-- Forms -->
       <div v-if="showMealForm" class="form-overlay">
-      <div class="form-container">
-        <h3>Add Meal</h3>
-        
-        <!-- Food Search -->
-        <div class="food-search">
-          <input 
-            v-model="foodQuery" 
-            @input="searchFood"
-            placeholder="Search for food (e.g., apple, chicken breast)" 
-            class="search-input"
-          />
-          <div v-if="searchingFood" class="search-loading">Searching...</div>
-          
-          <!-- Search Results -->
-          <div v-if="foodResults.length > 0" class="food-results">
-            <div class="results-header">Select a food:</div>
-            <div 
-              v-for="(food, index) in foodResults" 
-              :key="index"
-              @click="selectFood(food)"
-              class="food-result-item"
-            >
-              <div class="food-name">{{ food.name }}</div>
-              <div class="food-calories">{{ Math.round(food.calories) }} kcal per {{ food.serving }}</div>
-            </div>
-          </div>
-        </div>
+        <div class="form-container">
+          <h3>Add Meal</h3>
 
-        <!-- Manual Entry -->
-        <div class="manual-entry">
-          <div class="or-divider">OR enter manually</div>
-          <input v-model="mealName" placeholder="Meal Name" />
-          
-          <!-- Meal Type Selector -->
-          <div class="meal-type-selector">
-            <label>Meal Type:</label>
-            <select v-model="mealType">
-              <option v-for="type in mealTypes" :key="type" :value="type">
-                {{ type }}
-              </option>
-            </select>
-          </div>
-          
-          <input
-            v-model.number="mealCalories"
-            type="number"
-            placeholder="Calories"
-          />
-          
-          <!-- Show nutrition data if available -->
-          <div v-if="selectedFoodData" class="nutrition-preview">
-            <div class="nutrition-preview-title">📊 Nutrition Information:</div>
-            <div class="nutrition-preview-grid">
-              <div class="nutrition-item">
-                <span class="nutrition-label">Carbs:</span>
-                <span class="nutrition-value">{{ mealCarbs }}g</span>
-              </div>
-              <div class="nutrition-item">
-                <span class="nutrition-label">Protein:</span>
-                <span class="nutrition-value">{{ mealProtein }}g</span>
-              </div>
-              <div class="nutrition-item">
-                <span class="nutrition-label">Fat:</span>
-                <span class="nutrition-value">{{ mealFat }}g</span>
+          <!-- Food Search -->
+          <div class="food-search">
+            <input
+              v-model="foodQuery"
+              @input="searchFood"
+              placeholder="Search for food (e.g., apple, chicken breast)"
+              class="search-input"
+            />
+            <div v-if="searchingFood" class="search-loading">Searching...</div>
+
+            <!-- Search Results -->
+            <div v-if="foodResults.length > 0" class="food-results">
+              <div class="results-header">Select a food:</div>
+              <div
+                v-for="(food, index) in foodResults"
+                :key="index"
+                @click="selectFood(food)"
+                class="food-result-item"
+              >
+                <div class="food-name">{{ food.name }}</div>
+                <div class="food-calories">
+                  {{ Math.round(food.calories) }} kcal per {{ food.serving }}
+                </div>
               </div>
             </div>
-            <div class="nutrition-note">
-              ✨ Nutrition data will be saved automatically
+          </div>
+
+          <!-- Manual Entry -->
+          <div class="manual-entry">
+            <div class="or-divider">OR enter manually</div>
+            <input v-model="mealName" placeholder="Meal Name" />
+
+            <!-- Meal Type Selector -->
+            <div class="meal-type-selector">
+              <label>Meal Type:</label>
+              <select v-model="mealType">
+                <option v-for="type in mealTypes" :key="type" :value="type">
+                  {{ type }}
+                </option>
+              </select>
+            </div>
+
+            <input
+              v-model.number="mealCalories"
+              type="number"
+              placeholder="Calories"
+            />
+
+            <!-- Show nutrition data if available -->
+            <div v-if="selectedFoodData" class="nutrition-preview">
+              <div class="nutrition-preview-title">
+                📊 Nutrition Information:
+              </div>
+              <div class="nutrition-preview-grid">
+                <div class="nutrition-item">
+                  <span class="nutrition-label">Carbs:</span>
+                  <span class="nutrition-value">{{ mealCarbs }}g</span>
+                </div>
+                <div class="nutrition-item">
+                  <span class="nutrition-label">Protein:</span>
+                  <span class="nutrition-value">{{ mealProtein }}g</span>
+                </div>
+                <div class="nutrition-item">
+                  <span class="nutrition-label">Fat:</span>
+                  <span class="nutrition-value">{{ mealFat }}g</span>
+                </div>
+              </div>
+              <div class="nutrition-note">
+                ✨ Nutrition data will be saved automatically
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div class="form-buttons">
-          <button @click="addMeal" :disabled="!mealName || !mealCalories">Submit</button>
-          <button @click="closeMealForm" class="cancel-btn">Cancel</button>
+
+          <div class="form-buttons">
+            <button @click="addMeal" :disabled="!mealName || !mealCalories">
+              Submit
+            </button>
+            <button @click="closeMealForm" class="cancel-btn">Cancel</button>
+          </div>
         </div>
       </div>
-    </div>
 
       <div v-if="showWaterForm" class="form-overlay">
         <div class="form-container">
@@ -165,12 +171,10 @@
           <CaloriesLineChart
             v-if="weeklyCalories.length && dataFetched"
             :data="weeklyCalories"
-            />
-          
+          />
         </div>
       </section>
 
-      
       <!-- AI Recommendations -->
       <section class="recommendations-section">
         <h2>AI Nutrition Recommendations</h2>
@@ -178,7 +182,10 @@
           Get personalized advice based on your daily intake
         </p>
         <div class="rec-controls">
-          <button @click="getRecommendation" :disabled="loading || !dataFetched">
+          <button
+            @click="getRecommendation"
+            :disabled="loading || !dataFetched"
+          >
             {{ loading ? "Analyzing..." : "Get Daily Recommendation" }}
           </button>
           <button @click="clearRecommendation" v-if="recommendation || error">
@@ -247,27 +254,27 @@ let searchTimeout = null;
 // Search food function - now calls backend API
 async function searchFood() {
   clearTimeout(searchTimeout);
-  
+
   if (!foodQuery.value || foodQuery.value.length < 2) {
     foodResults.value = [];
     return;
   }
-  
+
   searchingFood.value = true;
-  
+
   searchTimeout = setTimeout(async () => {
     try {
       const query = encodeURIComponent(foodQuery.value);
       const url = `${API_URL}/api/food/search?query=${query}`;
-      
+
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`API Error: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (data.foods && data.foods.length > 0) {
         foodResults.value = data.foods;
       } else {
@@ -373,49 +380,54 @@ async function fetchWeeklyCalories() {
     dailyCalories[d.toISOString().split("T")[0]] = 0;
   }
 
-  meals?.forEach(m => {
+  meals?.forEach((m) => {
     dailyCalories[m.date] = (dailyCalories[m.date] || 0) + m.calories;
   });
 
-  weeklyCalories.value = Object.entries(dailyCalories).map(([date, value]) => ({ date, value }));
+  weeklyCalories.value = Object.entries(dailyCalories).map(([date, value]) => ({
+    date,
+    value,
+  }));
 }
 
 // Add entries
 async function addMeal() {
   if (!mealName.value || !mealCalories.value) return;
-  
-  const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-  
+
+  const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
+
   // Add meal to meals table
   await supabase
     .from("meals")
     .insert([
       { user_id: user.id, name: mealName.value, calories: mealCalories.value },
     ]);
-  
+
   // Add meal to planned_meals table for meal planner integration
-  await supabase
-    .from("planned_meals")
-    .insert([
-      {
-        user_id: user.id,
-        date: today,
-        meal_type: mealType.value,
-        name: mealName.value,
-        calories: mealCalories.value,
-        protein: mealProtein.value || 0,
-        carbs: mealCarbs.value || 0,
-        fat: mealFat.value || 0,
-      },
-    ]);
-  
+  await supabase.from("planned_meals").insert([
+    {
+      user_id: user.id,
+      date: today,
+      meal_type: mealType.value,
+      name: mealName.value,
+      calories: mealCalories.value,
+      protein: mealProtein.value || 0,
+      carbs: mealCarbs.value || 0,
+      fat: mealFat.value || 0,
+    },
+  ]);
+
   // If we have nutrition data (from food search), add it to nutrition table
-  if (mealCarbs.value !== null || mealProtein.value !== null || mealFat.value !== null) {
-    const nutritionCalories = 
+  if (
+    mealCarbs.value !== null ||
+    mealProtein.value !== null ||
+    mealFat.value !== null
+  ) {
+    const nutritionCalories =
       (mealCarbs.value || 0) * 4 +
       (mealProtein.value || 0) * 4 +
       (mealFat.value || 0) * 9;
-      
+
     await supabase.from("nutrition").insert([
       {
         user_id: user.id,
@@ -426,9 +438,13 @@ async function addMeal() {
       },
     ]);
   }
-  
+
   // Reset form
-  await supabase.from("meals").insert([{ user_id: user.id, name: mealName.value, calories: mealCalories.value }]);
+  await supabase
+    .from("meals")
+    .insert([
+      { user_id: user.id, name: mealName.value, calories: mealCalories.value },
+    ]);
   mealName.value = "";
   mealCalories.value = null;
   mealCarbs.value = null;
@@ -442,22 +458,30 @@ async function addMeal() {
 
 async function addWater() {
   if (!waterAmount.value) return;
-  await supabase.from("water_logs").insert([{ user_id: user.id, amount: waterAmount.value }]);
+  await supabase
+    .from("water_logs")
+    .insert([{ user_id: user.id, amount: waterAmount.value }]);
   waterAmount.value = null;
   showWaterForm.value = false;
   fetchData();
 }
 
 async function addNutrition() {
-  if (!nutritionCarbs.value && !nutritionProtein.value && !nutritionFat.value) return;
-  const calories = (nutritionCarbs.value || 0) * 4 + (nutritionProtein.value || 0) * 4 + (nutritionFat.value || 0) * 9;
-  await supabase.from("nutrition").insert([{
-    user_id: user.id,
-    carbs: nutritionCarbs.value || 0,
-    protein: nutritionProtein.value || 0,
-    fat: nutritionFat.value || 0,
-    calories
-  }]);
+  if (!nutritionCarbs.value && !nutritionProtein.value && !nutritionFat.value)
+    return;
+  const calories =
+    (nutritionCarbs.value || 0) * 4 +
+    (nutritionProtein.value || 0) * 4 +
+    (nutritionFat.value || 0) * 9;
+  await supabase.from("nutrition").insert([
+    {
+      user_id: user.id,
+      carbs: nutritionCarbs.value || 0,
+      protein: nutritionProtein.value || 0,
+      fat: nutritionFat.value || 0,
+      calories,
+    },
+  ]);
   nutritionCarbs.value = null;
   nutritionProtein.value = null;
   nutritionFat.value = null;
@@ -470,8 +494,16 @@ async function resetDailyCalories() {
   if (!user) return;
   const today = getToday();
 
-  await supabase.from("meals").delete().eq("user_id", user.id).gte("date", today);
-  await supabase.from("nutrition").delete().eq("user_id", user.id).gte("date", today);
+  await supabase
+    .from("meals")
+    .delete()
+    .eq("user_id", user.id)
+    .gte("date", today);
+  await supabase
+    .from("nutrition")
+    .delete()
+    .eq("user_id", user.id)
+    .gte("date", today);
 
   totalCalories.value = 0;
   totalCarbs.value = 0;
@@ -486,7 +518,11 @@ async function resetWeeklyChart() {
   startDate.setDate(startDate.getDate() - 6);
   const formattedStart = startDate.toISOString().split("T")[0];
 
-  await supabase.from("meals").delete().eq("user_id", user.id).gte("date", formattedStart);
+  await supabase
+    .from("meals")
+    .delete()
+    .eq("user_id", user.id)
+    .gte("date", formattedStart);
 
   weeklyCalories.value = [];
 }
@@ -505,9 +541,21 @@ async function getRecommendation() {
 
     // Fetch daily meals, water, nutrition
     const [mealsRes, waterRes, nutritionRes] = await Promise.all([
-      supabase.from("meals").select("*").eq("user_id", user.id).gte("date", today),
-      supabase.from("water_logs").select("*").eq("user_id", user.id).gte("date", today),
-      supabase.from("nutrition").select("*").eq("user_id", user.id).gte("date", today)
+      supabase
+        .from("meals")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("date", today),
+      supabase
+        .from("water_logs")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("date", today),
+      supabase
+        .from("nutrition")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("date", today),
     ]);
 
     const summary = {
@@ -516,19 +564,24 @@ async function getRecommendation() {
         water: totalWater.value,
         carbs: totalCarbs.value,
         protein: totalProtein.value,
-        fat: totalFat.value
+        fat: totalFat.value,
       },
       meals: mealsRes.data || [],
       waterLogs: waterRes.data || [],
-      nutritionEntries: nutritionRes.data || []
+      nutritionEntries: nutritionRes.data || [],
     };
 
     // Call your backend API for AI recommendation
-    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/recommendation`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ summary })
-    });
+    const response = await fetch(
+      `${
+        import.meta.env.VITE_API_URL || "http://localhost:3000"
+      }/api/recommendation`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ summary }),
+      }
+    );
 
     if (!response.ok) throw new Error("Failed to get recommendation");
     const data = await response.json();
@@ -611,7 +664,7 @@ watchEffect(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;

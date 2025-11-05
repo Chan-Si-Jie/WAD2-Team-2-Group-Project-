@@ -2,197 +2,201 @@
   <div>
     <!-- Navbar -->
     <Navbar />
-    
+
     <div class="fitness-page">
       <!-- Animated Header -->
       <div class="header-section">
         <h1 class="main-title">
           <span class="emoji-float">🏋️‍♂️</span>
           Fitness Tracker
-        <span class="emoji-float">💪</span>
-      </h1>
-      <div class="header-glow"></div>
-    </div>
-
-    <!-- Login Prompt -->
-    <div v-if="!userState.user" class="login-card">
-      <div class="login-icon">🔐</div>
-      <h2>Welcome Back, Champion!</h2>
-      <p>Log in to crush your fitness goals and track your progress.</p>
-      <button @click="$router.push('/login')" class="login-btn">
-        <span>🚀 Start Your Journey</span>
-      </button>
-      <div class="login-particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
+          <span class="emoji-float">💪</span>
+        </h1>
+        <div class="header-glow"></div>
       </div>
-    </div>
 
-    <div v-else class="main-content">
-      <!-- Goals Section -->
-      <div class="goals-section">
-        <div class="section-header">
-          <h2>🎯 Your Goals</h2>
-          <p class="subtitle">Set your targets and watch yourself grow</p>
-        </div>
-
-        <div class="goal-cards">
-          <div class="goal-card calories-card">
-            <div class="card-icon">🔥</div>
-            <h3>Daily Calories</h3>
-            <div class="input-wrapper">
-              <input type="number" v-model="dailyGoal" min="100" />
-              <span class="unit">kcal</span>
-            </div>
-            <div class="progress-info">
-              <p class="progress-text">Weekly Progress</p>
-              <p class="progress-value">{{ weeklyCaloriesPercent }}%</p>
-            </div>
-            <ApexChart
-              type="radialBar"
-              :series="[weeklyCaloriesPercent]"
-              :options="goalRingOptions('Calories', '#ff6b6b')"
-              height="200"
-            />
-            <div class="card-shimmer"></div>
-          </div>
-
-          <div class="goal-card workouts-card">
-            <div class="card-icon">💪</div>
-            <h3>Weekly Workouts</h3>
-            <div class="input-wrapper">
-              <input type="number" v-model="weeklyGoal" min="1" />
-              <span class="unit">workouts</span>
-            </div>
-            <div class="progress-info">
-              <p class="progress-text">Progress</p>
-              <p class="progress-value">{{ weeklyWorkoutsPercent }}%</p>
-            </div>
-            <ApexChart
-              type="radialBar"
-              :series="[weeklyWorkoutsPercent]"
-              :options="goalRingOptions('Workouts', '#4ade80')"
-              height="200"
-            />
-            <div class="card-shimmer"></div>
-          </div>
-        </div>
-
-        <button @click="saveGoals" class="save-btn">
-          <span class="btn-icon">💾</span>
-          <span>Save Goals</span>
-          <span class="btn-shine"></span>
+      <!-- Login Prompt -->
+      <div v-if="!userState.user" class="login-card">
+        <div class="login-icon">🔐</div>
+        <h2>Welcome Back, Champion!</h2>
+        <p>Log in to crush your fitness goals and track your progress.</p>
+        <button @click="$router.push('/login')" class="login-btn">
+          <span>🚀 Start Your Journey</span>
         </button>
-      </div>
-
-      <!-- Weekly Bar Chart -->
-      <div class="bar-chart-section">
-        <div class="section-header">
-          <h2>📊 This Week's Daily Calories</h2>
-          <p class="subtitle">Track your weekly burn rate</p>
-        </div>
-        <div class="chart-container">
-          <ApexChart
-            type="bar"
-            :series="[{ name: 'Calories Burnt', data: weeklyDailyCalories }]"
-            :options="weeklyBarOptions"
-            height="320"
-          />
+        <div class="login-particles">
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
         </div>
       </div>
 
-      <!-- Workout Log Section -->
-      <div class="log-section">
-        <div class="section-header">
-          <h2>✍️ Log a Workout</h2>
-          <p class="subtitle">Record your sweat session</p>
-        </div>
-
-        <div class="log-card">
-          <div class="input-group">
-            <label>🏃 Workout Type</label>
-            <select v-model="workoutType" class="log-input">
-              <option disabled value="">Select Workout</option>
-              <option v-for="(rate, name) in calorieRates" :key="name">
-                {{ name }}
-              </option>
-            </select>
+      <div v-else class="main-content">
+        <!-- Goals Section -->
+        <div class="goals-section">
+          <div class="section-header">
+            <h2>🎯 Your Goals</h2>
+            <p class="subtitle">Set your targets and watch yourself grow</p>
           </div>
 
-          <div class="input-group">
-            <label>⏱️ Duration</label>
-            <div class="input-with-unit">
-              <input
-                type="number"
-                v-model="minutes"
-                min="1"
-                placeholder="30"
-                class="log-input"
-              />
-              <span class="input-unit">min</span>
-            </div>
-          </div>
-
-          <button @click="addWorkout" class="add-btn">
-            <span class="btn-icon">➕</span>
-            <span>Add Workout</span>
-            <span class="btn-ripple"></span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Workout History -->
-      <div class="history-section">
-        <div class="section-header">
-          <h2>📜 Workout History</h2>
-          <p class="subtitle">Your fitness journey timeline</p>
-        </div>
-
-        <transition-group name="workout" tag="div" class="history-cards">
-          <div v-for="w in workouts" :key="w.id" class="history-card">
-            <div class="card-badge">{{ getWorkoutEmoji(w.workout_type) }}</div>
-            <div class="history-content">
-              <div class="history-header">
-                <span class="workout-type">{{ w.workout_type }}</span>
-                <span class="date">{{ formatDate(w.date) }}</span>
+          <div class="goal-cards">
+            <div class="goal-card calories-card">
+              <div class="card-icon">🔥</div>
+              <h3>Daily Calories</h3>
+              <div class="input-wrapper">
+                <input type="number" v-model="dailyGoal" min="100" />
+                <span class="unit">kcal</span>
               </div>
-              <div class="history-details">
-                <div class="detail-item">
-                  <span class="detail-icon">⏱️</span>
-                  <span class="detail-value">{{ w.minutes }} min</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-icon">🔥</span>
-                  <span class="detail-value">{{ w.calories_burnt }} kcal</span>
-                </div>
+              <div class="progress-info">
+                <p class="progress-text">Weekly Progress</p>
+                <p class="progress-value">{{ weeklyCaloriesPercent }}%</p>
               </div>
-            </div>
-            <div class="mini-chart">
               <ApexChart
                 type="radialBar"
-                :series="[
-                  Math.min(
-                    Math.round((w.calories_burnt / dailyGoal) * 100),
-                    100
-                  ),
-                ]"
-                :options="goalRingOptions('', '#fbbf24', 0.5)"
-                height="70"
-                width="70"
+                :series="[weeklyCaloriesPercent]"
+                :options="goalRingOptions('Calories', '#ff6b6b')"
+                height="200"
               />
+              <div class="card-shimmer"></div>
+            </div>
+
+            <div class="goal-card workouts-card">
+              <div class="card-icon">💪</div>
+              <h3>Weekly Workouts</h3>
+              <div class="input-wrapper">
+                <input type="number" v-model="weeklyGoal" min="1" />
+                <span class="unit">workouts</span>
+              </div>
+              <div class="progress-info">
+                <p class="progress-text">Progress</p>
+                <p class="progress-value">{{ weeklyWorkoutsPercent }}%</p>
+              </div>
+              <ApexChart
+                type="radialBar"
+                :series="[weeklyWorkoutsPercent]"
+                :options="goalRingOptions('Workouts', '#4ade80')"
+                height="200"
+              />
+              <div class="card-shimmer"></div>
             </div>
           </div>
-        </transition-group>
 
-        <div v-if="!workouts.length" class="empty-state">
-          <div class="empty-icon">🏃‍♂️</div>
-          <p class="empty-text">No workouts logged yet.</p>
-          <p class="empty-subtext">Start your fitness journey today!</p>
+          <button @click="saveGoals" class="save-btn">
+            <span class="btn-icon">💾</span>
+            <span>Save Goals</span>
+            <span class="btn-shine"></span>
+          </button>
+        </div>
+
+        <!-- Weekly Bar Chart -->
+        <div class="bar-chart-section">
+          <div class="section-header">
+            <h2>📊 This Week's Daily Calories</h2>
+            <p class="subtitle">Track your weekly burn rate</p>
+          </div>
+          <div class="chart-container">
+            <ApexChart
+              type="bar"
+              :series="[{ name: 'Calories Burnt', data: weeklyDailyCalories }]"
+              :options="weeklyBarOptions"
+              height="320"
+            />
+          </div>
+        </div>
+
+        <!-- Workout Log Section -->
+        <div class="log-section">
+          <div class="section-header">
+            <h2>✍️ Log a Workout</h2>
+            <p class="subtitle">Record your sweat session</p>
+          </div>
+
+          <div class="log-card">
+            <div class="input-group">
+              <label>🏃 Workout Type</label>
+              <select v-model="workoutType" class="log-input">
+                <option disabled value="">Select Workout</option>
+                <option v-for="(rate, name) in calorieRates" :key="name">
+                  {{ name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>⏱️ Duration</label>
+              <div class="input-with-unit">
+                <input
+                  type="number"
+                  v-model="minutes"
+                  min="1"
+                  placeholder="30"
+                  class="log-input"
+                />
+                <span class="input-unit">min</span>
+              </div>
+            </div>
+
+            <button @click="addWorkout" class="add-btn">
+              <span class="btn-icon">➕</span>
+              <span>Add Workout</span>
+              <span class="btn-ripple"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Workout History -->
+        <div class="history-section">
+          <div class="section-header">
+            <h2>📜 Workout History</h2>
+            <p class="subtitle">Your fitness journey timeline</p>
+          </div>
+
+          <transition-group name="workout" tag="div" class="history-cards">
+            <div v-for="w in workouts" :key="w.id" class="history-card">
+              <div class="card-badge">
+                {{ getWorkoutEmoji(w.workout_type) }}
+              </div>
+              <div class="history-content">
+                <div class="history-header">
+                  <span class="workout-type">{{ w.workout_type }}</span>
+                  <span class="date">{{ formatDate(w.date) }}</span>
+                </div>
+                <div class="history-details">
+                  <div class="detail-item">
+                    <span class="detail-icon">⏱️</span>
+                    <span class="detail-value">{{ w.minutes }} min</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-icon">🔥</span>
+                    <span class="detail-value"
+                      >{{ w.calories_burnt }} kcal</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="mini-chart">
+                <ApexChart
+                  type="radialBar"
+                  :series="[
+                    Math.min(
+                      Math.round((w.calories_burnt / dailyGoal) * 100),
+                      100
+                    ),
+                  ]"
+                  :options="goalRingOptions('', '#fbbf24', 0.5)"
+                  height="70"
+                  width="70"
+                />
+              </div>
+            </div>
+          </transition-group>
+
+          <div v-if="!workouts.length" class="empty-state">
+            <div class="empty-icon">🏃‍♂️</div>
+            <p class="empty-text">No workouts logged yet.</p>
+            <p class="empty-subtext">Start your fitness journey today!</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -291,7 +295,7 @@ const loadData = async () => {
     .select("*")
     .eq("user_id", userId)
     .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 error when no data exists
-    
+
   if (goalData && !goalError) {
     dailyGoal.value = goalData.daily_calorie_goal;
     weeklyGoal.value = goalData.weekly_workout_goal;
@@ -447,8 +451,8 @@ onMounted(() => loadData());
 <style scoped>
 .fitness-page {
   padding: 2rem 2rem 2rem 2rem;
-  font-family: "Inter", "Poppins", sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: "Poppins", sans-serif;
+  background: white;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
@@ -463,24 +467,76 @@ onMounted(() => loadData());
   bottom: 0;
   background: radial-gradient(
       circle at 20% 50%,
-      rgba(255, 107, 107, 0.2) 0%,
+      rgba(46, 204, 113, 0.05) 0%,
       transparent 50%
     ),
     radial-gradient(
       circle at 80% 80%,
-      rgba(74, 222, 128, 0.2) 0%,
+      rgba(91, 141, 239, 0.05) 0%,
       transparent 50%
     ),
     radial-gradient(
       circle at 40% 90%,
-      rgba(251, 191, 36, 0.2) 0%,
+      rgba(39, 174, 96, 0.05) 0%,
       transparent 50%
     );
   pointer-events: none;
   z-index: 0;
 }
 
-/* Header Section */
+/* === HIGH-VISIBILITY SECTION HEADERS === */
+.section-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.section-header h2 {
+  display: inline-block;
+  background: #5b8def;
+  color: white !important;
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-size: 1.9rem;
+  font-weight: 800;
+  box-shadow: 0 6px 20px rgba(91, 141, 239, 0.35);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+  animation: headerPop 0.8s ease-out;
+}
+
+@keyframes headerPop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.subtitle {
+  color: #4b5563;
+  font-size: 1rem;
+  margin-top: 0.8rem;
+  font-weight: 500;
+}
+
+/* === EMOJI VISIBILITY === */
+.emoji-light {
+  color: #fff !important;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.6)) !important;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+}
+
+.emoji-dark {
+  color: #1e40af !important;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25)) !important;
+}
+
+/* Header */
 .header-section {
   position: relative;
   text-align: center;
@@ -491,11 +547,10 @@ onMounted(() => loadData());
 .main-title {
   font-size: 3.5rem;
   font-weight: 900;
-  color: white;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  position: relative;
+  color: #1e40af;
   display: inline-block;
   animation: titleBounce 2s ease-in-out infinite;
+  text-shadow: 0 4px 10px rgba(30, 64, 175, 0.2);
 }
 
 @keyframes titleBounce {
@@ -504,20 +559,20 @@ onMounted(() => loadData());
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-12px);
   }
 }
 
 .emoji-float {
   display: inline-block;
   animation: float 3s ease-in-out infinite;
-  font-size: 3rem;
+  font-size: 3.2rem;
+  class: emoji-dark;
 }
 
 .emoji-float:first-child {
   animation-delay: 0s;
 }
-
 .emoji-float:last-child {
   animation-delay: 1.5s;
 }
@@ -528,10 +583,10 @@ onMounted(() => loadData());
     transform: translateY(0) rotate(0deg);
   }
   25% {
-    transform: translateY(-15px) rotate(-5deg);
+    transform: translateY(-18px) rotate(-6deg);
   }
   75% {
-    transform: translateY(-10px) rotate(5deg);
+    transform: translateY(-12px) rotate(6deg);
   }
 }
 
@@ -540,11 +595,11 @@ onMounted(() => loadData());
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.3) 0%,
+    rgba(91, 141, 239, 0.2) 0%,
     transparent 70%
   );
   border-radius: 50%;
@@ -556,26 +611,24 @@ onMounted(() => loadData());
   0%,
   100% {
     transform: translate(-50%, -50%) scale(1);
-    opacity: 0.5;
+    opacity: 0.6;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.2);
-    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 0.9;
   }
 }
 
 /* Login Card */
 .login-card {
-  position: relative;
   max-width: 500px;
   margin: 4rem auto;
   padding: 3rem 2rem;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  border-radius: 30px;
+  background: linear-gradient(135deg, #5b8def 0%, #4178c7 100%);
+  border-radius: 20px;
   color: white;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(91, 141, 239, 0.35);
   animation: cardSlideIn 0.8s ease-out;
   z-index: 1;
 }
@@ -595,6 +648,7 @@ onMounted(() => loadData());
   font-size: 4rem;
   margin-bottom: 1rem;
   animation: iconSpin 4s linear infinite;
+  class: emoji-light;
 }
 
 @keyframes iconSpin {
@@ -609,136 +663,40 @@ onMounted(() => loadData());
 .login-card h2 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: white;
+  font-weight: 800;
 }
-
 .login-card p {
   font-size: 1.1rem;
-  opacity: 0.95;
+  color: rgba(255, 255, 255, 0.95);
   margin-bottom: 2rem;
 }
 
 .login-btn {
-  margin-top: 1rem;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  background: white;
+  color: #5b8def;
   border: none;
-  padding: 1rem 2.5rem;
-  border-radius: 50px;
+  padding: 1rem 2.8rem;
+  border-radius: 30px;
   font-weight: 700;
   font-size: 1.1rem;
   cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
   transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
   position: relative;
   overflow: hidden;
-}
-
-.login-btn::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.login-btn:hover::before {
-  width: 300px;
-  height: 300px;
 }
 
 .login-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.6);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.5);
 }
 
-.login-particles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: -1;
-}
-
-.particle {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  animation: particleFloat 10s infinite;
-}
-
-.particle:nth-child(1) {
-  left: 10%;
-  animation-delay: 0s;
-}
-
-.particle:nth-child(2) {
-  left: 50%;
-  animation-delay: 3s;
-}
-
-.particle:nth-child(3) {
-  left: 80%;
-  animation-delay: 6s;
-}
-
-@keyframes particleFloat {
-  0% {
-    bottom: -20px;
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    bottom: 110%;
-    opacity: 0;
-  }
-}
-
-/* Main Content */
-.main-content {
-  position: relative;
-  z-index: 1;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.section-header h2 {
-  font-size: 2rem;
-  color: white;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.subtitle {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
-  font-weight: 400;
-}
-
-/* Goals Section */
+/* === GOALS SECTION === */
 .goals-section {
   margin-bottom: 3rem;
   animation: fadeInUp 0.6s ease-out;
 }
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -759,34 +717,40 @@ onMounted(() => loadData());
 }
 
 .goal-card {
-  position: relative;
   background: white;
-  border-radius: 25px;
+  border-radius: 20px;
   padding: 2rem;
   width: 300px;
   text-align: center;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  position: relative;
   overflow: hidden;
 }
 
 .goal-card:hover {
-  transform: translateY(-15px) scale(1.02);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  transform: translateY(-15px) scale(1.03);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
 }
 
 .calories-card {
-  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
 }
-
 .workouts-card {
-  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+  background: linear-gradient(135deg, #5b8def 0%, #4178c7 100%);
+  color: white;
 }
 
 .card-icon {
-  font-size: 3rem;
+  font-size: 3.2rem;
   margin-bottom: 1rem;
   animation: iconBounce 2s ease-in-out infinite;
+}
+
+.calories-card .card-icon,
+.workouts-card .card-icon {
+  class: emoji-light;
 }
 
 @keyframes iconBounce {
@@ -795,15 +759,15 @@ onMounted(() => loadData());
     transform: scale(1);
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(1.25);
   }
 }
 
 .goal-card h3 {
   font-size: 1.5rem;
-  color: #1f2937;
   margin-bottom: 1rem;
   font-weight: 700;
+  color: inherit;
 }
 
 .input-wrapper {
@@ -817,7 +781,7 @@ onMounted(() => loadData());
 .input-wrapper input {
   width: 100px;
   padding: 0.8rem;
-  border-radius: 15px;
+  border-radius: 10px;
   border: 3px solid rgba(255, 255, 255, 0.8);
   background: rgba(255, 255, 255, 0.9);
   font-size: 1.2rem;
@@ -828,34 +792,31 @@ onMounted(() => loadData());
 
 .input-wrapper input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: white;
   transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
 
 .unit {
   font-weight: 600;
-  color: #1f2937;
   font-size: 0.9rem;
+  color: white;
 }
 
 .progress-info {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
   padding: 0 1rem;
+  margin-bottom: 1rem;
 }
-
 .progress-text {
   font-size: 0.9rem;
-  color: #4b5563;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 600;
 }
-
 .progress-value {
   font-size: 1.5rem;
-  color: #1f2937;
+  color: white;
   font-weight: 800;
 }
 
@@ -868,7 +829,7 @@ onMounted(() => loadData());
   background: linear-gradient(
     45deg,
     transparent 30%,
-    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.2) 50%,
     transparent 70%
   );
   animation: shimmer 3s infinite;
@@ -890,30 +851,30 @@ onMounted(() => loadData());
   justify-content: center;
   gap: 0.5rem;
   margin: 0 auto;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #27ae60;
   color: white;
   border: none;
   padding: 1rem 3rem;
-  border-radius: 50px;
+  border-radius: 25px;
   cursor: pointer;
   font-weight: 700;
   font-size: 1.1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
   position: relative;
   overflow: hidden;
 }
 
 .save-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+  background: #229954;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(39, 174, 96, 0.4);
 }
 
 .btn-icon {
   font-size: 1.3rem;
   animation: iconWiggle 1s ease-in-out infinite;
 }
-
 @keyframes iconWiggle {
   0%,
   100% {
@@ -946,24 +907,43 @@ onMounted(() => loadData());
   left: 100%;
 }
 
-/* Bar Chart Section */
+/* === BAR CHART === */
 .bar-chart-section {
   margin: 3rem auto;
   max-width: 900px;
-  background: white;
-  border-radius: 30px;
-  padding: 2rem;
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #5b8def 0%, #4178c7 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 25px rgba(91, 141, 239, 0.35);
+  color: white;
   animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 
-.chart-container {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-  border-radius: 20px;
-  padding: 1.5rem;
+.bar-chart-section .section-header h2 {
+  background: white;
+  color: #5b8def !important;
+  text-shadow: none;
 }
 
-/* Log Section */
+.bar-chart-section .subtitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.bar-chart-section .card-icon {
+  class: emoji-light;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: iconBounce 2s ease-in-out infinite;
+}
+
+.chart-container {
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+/* === LOG SECTION === */
 .log-section {
   margin: 3rem 0;
   animation: fadeInUp 0.8s ease-out 0.4s both;
@@ -976,17 +956,17 @@ onMounted(() => loadData());
   align-items: flex-end;
   gap: 1.5rem;
   padding: 2.5rem;
-  background: linear-gradient(135deg, #fdeb71 0%, #f8d800 100%);
-  border-radius: 30px;
-  box-shadow: 0 15px 50px rgba(248, 216, 0, 0.3);
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
   max-width: 900px;
   margin: 0 auto;
+  transition: all 0.3s ease;
 }
 
 .log-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 60px rgba(248, 216, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(39, 174, 96, 0.4);
 }
 
 .input-group {
@@ -997,7 +977,7 @@ onMounted(() => loadData());
 .input-group label {
   display: block;
   font-weight: 700;
-  color: #1f2937;
+  color: white;
   margin-bottom: 0.5rem;
   font-size: 1rem;
 }
@@ -1005,8 +985,8 @@ onMounted(() => loadData());
 .log-input {
   width: 100%;
   padding: 1rem;
-  border-radius: 15px;
-  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
   background: white;
   font-size: 1rem;
   font-weight: 600;
@@ -1015,16 +995,14 @@ onMounted(() => loadData());
 
 .log-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: white;
   transform: scale(1.02);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
 .input-with-unit {
   position: relative;
-  width: 100%;
 }
-
 .input-unit {
   position: absolute;
   right: 1rem;
@@ -1040,24 +1018,24 @@ onMounted(() => loadData());
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
+  background: white;
+  color: #27ae60;
   border: none;
   padding: 1rem 2.5rem;
-  border-radius: 50px;
+  border-radius: 25px;
   cursor: pointer;
   font-weight: 700;
   font-size: 1.1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
   position: relative;
   overflow: hidden;
   min-width: 200px;
 }
 
 .add-btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 12px 35px rgba(245, 87, 108, 0.6);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.4);
 }
 
 .btn-ripple {
@@ -1068,7 +1046,7 @@ onMounted(() => loadData());
   left: 0;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.3) 0%,
+    rgba(39, 174, 96, 0.2) 0%,
     transparent 70%
   );
   transform: scale(0);
@@ -1078,7 +1056,6 @@ onMounted(() => loadData());
 .add-btn:active .btn-ripple {
   animation: ripple 0.6s ease-out;
 }
-
 @keyframes ripple {
   to {
     transform: scale(2.5);
@@ -1086,7 +1063,7 @@ onMounted(() => loadData());
   }
 }
 
-/* History Section */
+/* === HISTORY SECTION === */
 .history-section {
   margin: 3rem 0;
   animation: fadeInUp 0.8s ease-out 0.6s both;
@@ -1106,9 +1083,9 @@ onMounted(() => loadData());
   justify-content: space-between;
   padding: 1.5rem;
   border-radius: 20px;
-  background: white;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.15);
+  transition: all 0.4s ease;
   position: relative;
   overflow: hidden;
 }
@@ -1120,7 +1097,7 @@ onMounted(() => loadData());
   top: 0;
   height: 100%;
   width: 5px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5b8def 0%, #27ae60 100%);
   transition: width 0.3s ease;
 }
 
@@ -1128,16 +1105,17 @@ onMounted(() => loadData());
   width: 100%;
   opacity: 0.1;
 }
-
 .history-card:hover {
   transform: translateX(10px) scale(1.02);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px rgba(39, 174, 96, 0.25);
 }
 
 .card-badge {
-  font-size: 2.5rem;
+  font-size: 2.6rem;
   margin-right: 1.5rem;
   animation: badgePulse 2s ease-in-out infinite;
+  color: #27ae60 !important;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
 }
 
 @keyframes badgePulse {
@@ -1146,36 +1124,27 @@ onMounted(() => loadData());
     transform: scale(1);
   }
   50% {
-    transform: scale(1.15);
+    transform: scale(1.18);
   }
 }
 
 .history-content {
   flex: 1;
 }
-
 .history-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   margin-bottom: 0.8rem;
 }
-
 .workout-type {
   font-weight: 700;
   font-size: 1.2rem;
-  color: #1f2937;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #2c3e50;
 }
-
 .date {
   font-size: 0.9rem;
-  color: #6b7280;
-  font-weight: 600;
-  background: #f3f4f6;
+  color: #666;
+  background: white;
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
 }
@@ -1184,51 +1153,46 @@ onMounted(() => loadData());
   display: flex;
   gap: 1.5rem;
 }
-
 .detail-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: white;
   padding: 0.5rem 1rem;
-  border-radius: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .detail-item:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
 }
-
 .detail-icon {
   font-size: 1.2rem;
 }
-
 .detail-value {
   font-weight: 700;
-  color: #1f2937;
+  color: #27ae60;
   font-size: 1rem;
-}
-
-.mini-chart {
-  margin-left: 1rem;
 }
 
 /* Empty State */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
-  border-radius: 30px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
   max-width: 600px;
   margin: 0 auto;
 }
 
 .empty-icon {
-  font-size: 5rem;
-  margin-bottom: 1rem;
+  font-size: 5.5rem;
+  margin-bottom: 1.2rem;
   animation: emptyIconMove 3s ease-in-out infinite;
+  class: emoji-dark;
 }
 
 @keyframes emptyIconMove {
@@ -1237,277 +1201,57 @@ onMounted(() => loadData());
     transform: translateX(0);
   }
   25% {
-    transform: translateX(-20px);
+    transform: translateX(-25px);
   }
   75% {
-    transform: translateX(20px);
+    transform: translateX(25px);
   }
 }
 
-.empty-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-}
-
-.empty-subtext {
-  font-size: 1.1rem;
-  color: #6b7280;
-}
-
-/* Workout Transitions */
-.workout-enter-active {
-  animation: workoutSlideIn 0.5s ease-out;
-}
-
-.workout-leave-active {
-  animation: workoutSlideOut 0.3s ease-in;
-}
-
-@keyframes workoutSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-100px) rotateY(-90deg);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0) rotateY(0);
-  }
-}
-
-@keyframes workoutSlideOut {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-}
-
-/* RESPONSIVE DESIGN */
-@media (max-width: 1200px) {
-  .fitness-page {
-    padding: 1.5rem;
-  }
-
-  .main-content {
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 900px) {
-  .goal-cards {
-    grid-template-columns: 1fr;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-  .bar-chart-section,
-  .workouts-section {
-    max-width: 100%;
-  }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-  .fitness-page {
-    padding: 1rem;
-  }
-
-  .main-title {
-    font-size: 2.5rem;
-  }
-
-  .section-header h2 {
-    font-size: 1.8rem;
-  }
-
-  .subtitle {
-    font-size: 0.9rem;
-  }
-
-  .goal-cards {
+  .goal-cards,
+  .log-card,
+  .history-card {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
-
   .goal-card {
     width: 100%;
     max-width: 350px;
   }
-
-  .log-card {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 1.5rem;
-  }
-
-  .input-group {
-    width: 100%;
-  }
-
-  .add-btn {
-    width: 100%;
-  }
-
-  .history-list {
-    gap: 1rem;
-  }
-
-  .history-card {
-    flex-direction: column;
-    text-align: center;
-    padding: 1.5rem;
-  }
-
-  .card-badge {
-    margin-right: 0;
-    margin-bottom: 1rem;
-  }
-
-  .history-header {
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
-  }
-
-  .history-details {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .mini-chart {
-    margin-left: 0;
-    margin-top: 1rem;
-  }
-
-  .chart-container {
-    padding: 1rem;
-  }
-
+  .add-btn,
   .save-btn {
-    padding: 0.9rem 1.8rem;
-    font-size: 1rem;
+    width: 100%;
   }
-}
-
-@media (max-width: 480px) {
-  .fitness-page {
-    padding: 0.75rem;
-  }
-
   .main-title {
-    font-size: 2rem;
+    font-size: 2.6rem;
   }
-
-  .emoji-float {
-    font-size: 1.5rem;
-  }
-
   .section-header h2 {
     font-size: 1.5rem;
-  }
-
-  .login-card {
-    padding: 2rem 1.5rem;
-  }
-
-  .login-card h2 {
-    font-size: 1.5rem;
-  }
-
-  .login-card p {
-    font-size: 0.9rem;
-  }
-
-  .goal-card {
-    padding: 1.5rem;
-  }
-
-  .goal-card h3 {
-    font-size: 1.1rem;
-  }
-
-  .input-wrapper input {
-    font-size: 1.5rem;
-    padding: 0.6rem;
-  }
-
-  .log-card {
-    padding: 1.2rem;
-  }
-
-  .log-card h3 {
-    font-size: 1.1rem;
-  }
-
-  .input-group input,
-  .input-group select {
-    font-size: 0.9rem;
-    padding: 0.7rem;
-  }
-
-  .add-btn {
-    padding: 0.7rem;
-    font-size: 0.9rem;
-  }
-
-  .history-card {
-    padding: 1.2rem;
-  }
-
-  .history-header h3 {
-    font-size: 1rem;
-  }
-
-  .history-stat {
-    font-size: 0.8rem;
-  }
-
-  .delete-btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-  }
-
-  .save-btn {
-    padding: 0.8rem 1.5rem;
-    font-size: 0.9rem;
-  }
-
-  .chart-container {
-    padding: 0.75rem;
+    padding: 0.6rem 1.5rem;
   }
 }
 
-/* Smooth Scrolling */
 html {
   scroll-behavior: smooth;
 }
-
-/* Selection Color */
 ::selection {
-  background: #fbbf24;
+  background: #5b8def;
   color: white;
 }
-
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 12px;
 }
-
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #5b8def;
   border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  background: #1e40af;
 }
 </style>
