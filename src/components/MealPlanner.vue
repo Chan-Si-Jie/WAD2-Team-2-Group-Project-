@@ -1,12 +1,13 @@
 <template>
-  <div class="meal-planner-page">
+  <div>
     <Navbar />
-
-    <div class="meal-planner">
-      <header class="planner-header">
-        <h1>🍽️ Meal Planner</h1>
-        <p>Plan your weekly meals and generate shopping lists</p>
-      </header>
+    
+    <div class="meal-planner-page">
+      <div class="meal-planner">
+        <header class="planner-header">
+          <h1>🍽️ Meal Planner</h1>
+          <p>Plan your weekly meals and generate shopping lists</p>
+        </header>
 
       <!-- Tab Navigation -->
       <div class="tabs">
@@ -326,6 +327,7 @@
         <button @click="closeRecipeView" class="close-btn">Close</button>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -701,7 +703,7 @@ onMounted(() => {
 .meal-planner-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 2rem;
+  padding: 2rem 2rem 2rem 2rem;
   font-family: "Poppins", sans-serif;
 }
 
@@ -1332,30 +1334,96 @@ onMounted(() => {
   margin-bottom: 0.5rem;
 }
 
-/* Responsive */
+/* RESPONSIVE DESIGN */
 @media (max-width: 1200px) {
+  .meal-planner {
+    max-width: 100%;
+  }
+
   .weekly-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .day-column {
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 900px) {
+  .weekly-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .recipes-grid,
+  .favorites-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .weekly-grid {
-    grid-template-columns: 1fr;
+  .meal-planner-page {
+    padding: 1rem;
+  }
+
+  .planner-header h1 {
+    font-size: 2rem;
+  }
+
+  .planner-header p {
+    font-size: 1rem;
   }
 
   .tabs {
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .tabs button {
     padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .weekly-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .day-column {
+    min-width: 100%;
   }
 
   .week-selector {
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .week-selector button {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .recipes-grid,
+  .favorites-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-card,
+  .favorite-card {
+    max-width: 100%;
+  }
+
+  .recipes-header,
+  .shopping-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .create-btn,
+  .generate-btn {
+    width: 100%;
+    max-width: 250px;
   }
 
   .nutrition-inputs {
@@ -1364,6 +1432,92 @@ onMounted(() => {
 
   .ingredient-row {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .ingredient-row input {
+    width: 100%;
+  }
+
+  .nutrition-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 500px;
+    padding: 1.5rem;
+  }
+
+  .form-container {
+    width: 95%;
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 480px) {
+  .meal-planner-page {
+    padding: 0.5rem;
+  }
+
+  .planner-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .planner-header p {
+    font-size: 0.9rem;
+  }
+
+  .tabs button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .day-column h4 {
+    font-size: 1rem;
+  }
+
+  .meal-header strong {
+    font-size: 0.85rem;
+  }
+
+  .planned-meal {
+    font-size: 0.85rem;
+    padding: 0.4rem;
+  }
+
+  .calories {
+    font-size: 0.75rem;
+  }
+
+  .recipe-card h3,
+  .favorite-card h3 {
+    font-size: 1rem;
+  }
+
+  .recipe-stats,
+  .favorite-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .recipe-stats button,
+  .favorite-actions button {
+    width: 100%;
+  }
+
+  .shopping-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .modal-content {
+    padding: 1rem;
+  }
+
+  .modal-content h2 {
+    font-size: 1.3rem;
   }
 }
 </style>

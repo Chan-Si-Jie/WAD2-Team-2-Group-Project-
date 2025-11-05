@@ -104,43 +104,92 @@
     <!-- CONTACT SECTION -->
     <section class="contact" id="contact">
       <div class="container contact-container">
-        <h2>Contact Us</h2>
-        <p>
-          Have questions, feedback, or need support? We'd love to hear from you!
-          Reach out through any of the channels below or send us a message
-          directly.
-        </p>
+        <div class="contact-header">
+          <h2>Get In Touch</h2>
+          <p>
+            Have questions, feedback, or need support? We'd love to hear from you!
+            Reach out through any of the channels below or send us a message directly.
+          </p>
+        </div>
 
         <div class="contact-grid">
-          <!-- Contact Info -->
+          <!-- Contact Info Cards -->
           <div class="contact-info">
-            <div class="info-card">
-              <div>
-                <h4>Email</h4>
-                <a href="mailto:hello@smartcal.com">hello@smartcal.com</a>
+            <div class="info-card email-card">
+              <div class="icon-wrapper">
+                <i class="fas fa-envelope"></i>
               </div>
+              <h4>Email Us</h4>
+              <a href="mailto:hello@smartcal.com">hello@smartcal.com</a>
+              <p class="info-desc">We'll respond within 24 hours</p>
             </div>
-            <div class="info-card">
-              <div>
-                <h4>Phone</h4>
-                <a href="tel:+6598888999">+65 9888 8999</a>
+            
+            <div class="info-card phone-card">
+              <div class="icon-wrapper">
+                <i class="fas fa-phone-alt"></i>
               </div>
+              <h4>Call Us</h4>
+              <a href="tel:+6598888999">+65 9888 8999</a>
+              <p class="info-desc">Mon-Fri, 9AM-6PM SGT</p>
             </div>
-            <div class="info-card">
-              <div>
-                <h4>Address</h4>
-                80 Stamford Rd, Singapore 178902
+            
+            <div class="info-card location-card">
+              <div class="icon-wrapper">
+                <i class="fas fa-map-marker-alt"></i>
               </div>
+              <h4>Visit Us</h4>
+              <p>80 Stamford Rd<br>Singapore 178902</p>
+              <p class="info-desc">Find us at the heart of the city</p>
             </div>
           </div>
 
           <!-- Contact Form -->
-          <div class="contact-form">
-            <form>
-              <input type="text" placeholder="Your Name" required />
-              <input type="email" placeholder="Your Email" required />
-              <textarea rows="5" placeholder="Your Message" required></textarea>
-              <button type="submit">Send Message</button>
+          <div class="contact-form-wrapper">
+            <div class="form-header">
+              <h3>Send us a Message</h3>
+              <p>Fill out the form below and we'll get back to you shortly</p>
+            </div>
+            <form class="contact-form" @submit.prevent="handleSubmit">
+              <div class="form-group">
+                <label for="name">
+                  <i class="fas fa-user"></i> Your Name
+                </label>
+                <input 
+                  type="text" 
+                  id="name"
+                  placeholder="John Doe" 
+                  required 
+                />
+              </div>
+              
+              <div class="form-group">
+                <label for="email">
+                  <i class="fas fa-envelope"></i> Your Email
+                </label>
+                <input 
+                  type="email" 
+                  id="email"
+                  placeholder="john@example.com" 
+                  required 
+                />
+              </div>
+              
+              <div class="form-group">
+                <label for="message">
+                  <i class="fas fa-comment-dots"></i> Your Message
+                </label>
+                <textarea 
+                  id="message"
+                  rows="5" 
+                  placeholder="Tell us how we can help you..." 
+                  required
+                ></textarea>
+              </div>
+              
+              <button type="submit" class="submit-btn">
+                <span>Send Message</span>
+                <i class="fas fa-paper-plane"></i>
+              </button>
             </form>
           </div>
         </div>
@@ -159,6 +208,11 @@
 <script setup>
 import Navbar from "../components/Navbar.vue";
 import AnimatedModel from "../components/AnimatedModel.vue";
+
+const handleSubmit = (event) => {
+  alert("Thank you for your message! We'll get back to you soon.");
+  event.target.reset();
+};
 </script>
 
 <style>
@@ -399,87 +453,335 @@ body {
 
 /* CONTACT SECTION */
 .contact {
-  background: #f9f9f9;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 100px 20px;
-  text-align: center;
   width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: float 20s linear infinite;
 }
 
 .contact-container {
-  max-width: 1300px;
+  max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
-.contact h2 {
-  font-size: 2.2rem;
+.contact-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.contact-header h2 {
+  font-size: 2.5rem;
   margin-bottom: 15px;
-  color: #2c3e50;
+  color: white;
+  font-weight: 700;
 }
 
-.contact p {
-  color: #555;
-  margin-bottom: 40px;
-  font-size: 1rem;
+.contact-header p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
   line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .contact-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 40px;
+  align-items: start;
 }
 
+/* Contact Info Cards */
 .contact-info {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  align-items: center;
 }
 
 .info-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 500px;
   background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.info-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.info-card:hover::before {
+  transform: scaleX(1);
 }
 
 .info-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+.icon-wrapper {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
 .info-card h4 {
-  margin-bottom: 6px;
-  font-size: 1rem;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #2c3e50;
 }
 
 .info-card a {
-  color: #27ae60;
+  color: #667eea;
   text-decoration: none;
+  font-weight: 500;
+  font-size: 1.05rem;
+  transition: color 0.3s ease;
 }
 
 .info-card a:hover {
-  text-decoration: underline;
+  color: #764ba2;
 }
 
-/* Responsive */
+.info-card p {
+  color: #555;
+  margin-top: 5px;
+  line-height: 1.6;
+}
+
+.info-desc {
+  font-size: 0.9rem;
+  color: #999 !important;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* Contact Form */
+.contact-form-wrapper {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.form-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.form-header h3 {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.form-header p {
+  color: #777;
+  font-size: 0.95rem;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group label i {
+  color: #667eea;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 14px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn i {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.submit-btn:hover i {
+  transform: translateX(5px);
+}
+
+/* RESPONSIVE DESIGN */
+
+/* Large tablets and small desktops */
+@media (max-width: 1024px) {
+  .hero-text h1 {
+    font-size: 2.2rem;
+  }
+
+  .features h2,
+  .about-text h2,
+  .contact h2 {
+    font-size: 2rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 900px;
+  }
+}
+
+/* Tablets */
 @media (max-width: 768px) {
+  .hero {
+    padding: 60px 15px;
+  }
+
   .hero-content {
+    flex-direction: column;
     gap: 30px;
+  }
+
+  .hero-text {
+    text-align: center;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .hero-text p {
+    font-size: 1rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .cta-btn,
+  .fitness-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .features,
+  .about,
+  .contact {
+    padding: 60px 15px;
+  }
+
+  .features h2,
+  .about-text h2,
+  .contact-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 400px;
   }
 
   .about-container {
     flex-direction: column;
     text-align: center;
     gap: 30px;
+  }
+
+  .about-text p {
+    font-size: 1rem;
   }
 
   .about-image img {
@@ -489,6 +791,108 @@ body {
   .contact-grid {
     grid-template-columns: 1fr;
     gap: 30px;
+  }
+
+  .contact-form-wrapper {
+    padding: 30px 20px;
+  }
+
+  .form-header h3 {
+    font-size: 1.5rem;
+  }
+
+  .info-card {
+    max-width: 100%;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .hero {
+    padding: 40px 10px;
+  }
+
+  .hero-text h1 {
+    font-size: 1.6rem;
+  }
+
+  .hero-text p {
+    font-size: 0.9rem;
+  }
+
+  .cta-btn,
+  .fitness-btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+
+  .features h2,
+  .about-text h2,
+  .contact-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .features,
+  .about,
+  .contact {
+    padding: 40px 10px;
+  }
+
+  .feature-grid {
+    max-width: 100%;
+  }
+
+  .card {
+    padding: 20px 15px;
+  }
+
+  .card img {
+    width: 60px;
+  }
+
+  .about-text p {
+    font-size: 0.9rem;
+  }
+
+  .contact-header p {
+    font-size: 0.9rem;
+  }
+
+  .contact-form-wrapper {
+    padding: 25px 15px;
+  }
+
+  .form-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .form-header p {
+    font-size: 0.85rem;
+  }
+
+  .info-card {
+    padding: 20px;
+  }
+
+  .icon-wrapper {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .info-card h4 {
+    font-size: 1.1rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+  }
+
+  .submit-btn {
+    padding: 14px 28px;
+    font-size: 1rem;
   }
 }
 

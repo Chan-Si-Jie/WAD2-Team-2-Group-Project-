@@ -152,14 +152,102 @@
   opacity: 1;
 }
 
-/* Responsive */
+/* RESPONSIVE DESIGN */
+
+/* Tablets and below */
 @media (max-width: 768px) {
+  .log-page {
+    padding: 1rem;
+  }
+
+  .log-header h1 {
+    font-size: 2rem;
+  }
+
+  .log-header p {
+    font-size: 1rem;
+  }
+
+  .log-entry h2 {
+    font-size: 1.3rem;
+  }
+
+  .input-group {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .input-group input {
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .input-group button {
+    width: 100%;
+    max-width: 350px;
+  }
+
   .food-cards {
     flex-direction: column;
     align-items: center;
   }
 
-  .input-group input {
+  .food-card {
     width: 100%;
+    max-width: 350px;
+  }
+
+  .chart-section h2 {
+    font-size: 1.3rem;
+  }
+
+  .chart-wrapper {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .log-page {
+    padding: 0.5rem;
+  }
+
+  .log-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .log-header p {
+    font-size: 0.9rem;
+  }
+
+  .log-entry h2 {
+    font-size: 1.1rem;
+  }
+
+  .input-group input,
+  .input-group button {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .food-card {
+    padding: 1rem;
+    width: 100%;
+  }
+
+  .food-card h3 {
+    font-size: 1rem;
+  }
+
+  .food-card p {
+    font-size: 0.85rem;
+  }
+
+  .log-footer button {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
   }
 }

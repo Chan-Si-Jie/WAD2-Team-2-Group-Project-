@@ -512,4 +512,107 @@ watchEffect(() => {
   color: #ffdddd;
   margin: 0;
 }
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+  .dashboard {
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-header p {
+    font-size: 0.9rem;
+  }
+
+  .rings {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .ring {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .quick-actions h2 {
+    font-size: 1.3rem;
+  }
+
+  .quick-actions button {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0.5rem auto;
+  }
+
+  .recommendations-section {
+    padding: 1.5rem;
+  }
+
+  .recommendations-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .rec-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .rec-controls button {
+    width: 100%;
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: 0.75rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .ring {
+    padding: 1rem;
+  }
+
+  .value {
+    font-size: 1.3rem;
+  }
+
+  .quick-actions button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .form-container {
+    width: 90%;
+    max-width: 300px;
+    padding: 1.5rem;
+  }
+
+  .recommendations-section {
+    padding: 1rem;
+  }
+
+  .recommendations-section h2 {
+    font-size: 1.3rem;
+  }
+
+  .rec-output {
+    padding: 1rem;
+  }
+}
 </style>
