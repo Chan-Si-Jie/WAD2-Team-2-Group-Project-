@@ -103,6 +103,75 @@ Keep the response concise (3-4 sentences) and actionable.`;
   }
 });
 
+// Food search endpoint using USDA API
+app.get("/api/food/search", async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query || query.length < 2) {
+      return res.status(400).json({
+        error: "Query must be at least 2 characters long",
+      });
+    }
+
+    const USDA_API_KEY = process.env.USDA_API_KEY;
+    
+    if (!USDA_API_KEY) {
+      return res.status(500).json({
+        error: "USDA API key not configured",
+      });
+    }
+
+    const encodedQuery = encodeURIComponent(query);
+    const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${USDA_API_KEY}&query=${encodedQuery}&pageSize=8&dataType=Foundation,SR Legacy`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`USDA API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.foods && data.foods.length > 0) {
+      const foods = data.foods.map((food) => {
+        const nutrients = food.foodNutrients || [];
+
+        const getNutrient = (nutrientId) => {
+          const nutrient = nutrients.find((n) => n.nutrientId === nutrientId);
+          return nutrient ? Math.round(nutrient.value) : 0;
+        };
+
+        return {
+          name: food.description || food.lowercaseDescription || "Unknown",
+          calories: getNutrient(1008), // Energy (kcal)
+          serving: "100g",
+          carbs: getNutrient(1005), // Carbohydrate
+          protein: getNutrient(1003), // Protein
+          fat: getNutrient(1004), // Total lipid (fat)
+          foodId: food.fdcId,
+        };
+      });
+
+      res.json({
+        foods,
+        success: true,
+      });
+    } else {
+      res.json({
+        foods: [],
+        success: true,
+      });
+    }
+  } catch (error) {
+    console.error("Error searching food:", error);
+    res.status(500).json({
+      error: "Failed to search food",
+      message: error.message,
+    });
+  }
+});
+
 // Start server (for local development)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {

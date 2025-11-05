@@ -286,12 +286,13 @@ const loadData = async () => {
   if (!userState.user) return;
   const userId = userState.user.id;
 
-  const { data: goalData } = await supabase
+  const { data: goalData, error: goalError } = await supabase
     .from("fitness_goals")
     .select("*")
     .eq("user_id", userId)
-    .single();
-  if (goalData) {
+    .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 error when no data exists
+    
+  if (goalData && !goalError) {
     dailyGoal.value = goalData.daily_calorie_goal;
     weeklyGoal.value = goalData.weekly_workout_goal;
   }
