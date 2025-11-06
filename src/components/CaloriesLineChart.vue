@@ -6,13 +6,23 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { Line } from "vue-chartjs";
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement } from "chart.js";
 ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement);
 
 const props = defineProps({ data: Array });
-const chartData = {
-  labels: props.data.map(d => d.date.slice(5)),
+
+// Format date labels to show just MM-DD
+const formatDateLabel = (dateStr) => {
+  // Extract just the date part (before any 'T' or timestamp)
+  const datePart = dateStr.split('T')[0];
+  // Get MM-DD portion
+  return datePart.slice(5);
+};
+
+const chartData = computed(() => ({
+  labels: props.data.map(d => formatDateLabel(d.date)),
   datasets: [
     {
       label: "Calories",
@@ -23,7 +33,8 @@ const chartData = {
       fill: true,
     },
   ],
-};
+}));
+
 const chartOptions = { responsive: true, plugins: { legend: { display: false } } };
 </script>
 

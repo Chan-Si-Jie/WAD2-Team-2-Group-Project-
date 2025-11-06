@@ -267,7 +267,8 @@ async function searchFood() {
   searchTimeout = setTimeout(async () => {
     try {
       const query = encodeURIComponent(foodQuery.value);
-      const url = `${API_URL}/api/food/search?query=${query}`;
+      const url = `${import.meta.env.VITE_API_URL || "http://localhost:3000"
+      }/api/food/search?query=${query}`;
 
       const response = await fetch(url);
 
@@ -368,12 +369,19 @@ async function fetchWeeklyCalories() {
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - 6);
   const formattedStart = startDate.toISOString().split("T")[0];
+  const formattedEnd = new Date().toISOString().split("T")[0];
 
-  const { data: meals } = await supabase
+  console.log("Fetching meals from", formattedStart, "to", formattedEnd);
+
+  const { data: meals, error } = await supabase
     .from("meals")
     .select("date, calories")
     .eq("user_id", user.id)
-    .gte("date", formattedStart);
+    .gte("date", formattedStart)
+    .lte("date", formattedEnd);
+
+  console.log("Fetched meals:", meals);
+  if (error) console.error("Error fetching meals:", error);
 
   const dailyCalories = {};
   for (let i = 0; i < 7; i++) {
@@ -383,13 +391,19 @@ async function fetchWeeklyCalories() {
   }
 
   meals?.forEach((m) => {
-    dailyCalories[m.date] = (dailyCalories[m.date] || 0) + m.calories;
+    const dateKey = m.date.split('T')[0];
+    console.log("Adding meal with date:", dateKey, "calories:", m.calories);
+    dailyCalories[dateKey] = (dailyCalories[dateKey] || 0) + m.calories;
   });
+
+  console.log("Daily calories:", dailyCalories);
 
   weeklyCalories.value = Object.entries(dailyCalories).map(([date, value]) => ({
     date,
     value,
   }));
+  
+  console.log("Weekly calories for chart:", weeklyCalories.value);
 }
 
 // Add entries
@@ -402,7 +416,16 @@ async function addMeal() {
   await supabase
     .from("meals")
     .insert([
-      { user_id: user.id, name: mealName.value, calories: mealCalories.value },
+      { 
+        user_id: user.id, 
+        name: mealName.value, 
+        calories: mealCalories.value, 
+        date: today, 
+        meal_date: today,
+        protein: mealProtein.value || 0,
+        carbs: mealCarbs.value || 0,
+        fat: mealFat.value || 0
+      },
     ]);
 
   // Add meal to planned_meals table for meal planner integration
@@ -433,6 +456,7 @@ async function addMeal() {
     await supabase.from("nutrition").insert([
       {
         user_id: user.id,
+        date: today,
         carbs: mealCarbs.value || 0,
         protein: mealProtein.value || 0,
         fat: mealFat.value || 0,
@@ -442,11 +466,6 @@ async function addMeal() {
   }
 
   // Reset form
-  await supabase
-    .from("meals")
-    .insert([
-      { user_id: user.id, name: mealName.value, calories: mealCalories.value },
-    ]);
   mealName.value = "";
   mealCalories.value = null;
   mealCarbs.value = null;
@@ -454,8 +473,12 @@ async function addMeal() {
   mealFat.value = null;
   mealType.value = "Breakfast"; // Reset to default
   selectedFoodData.value = null;
+  foodQuery.value = "";
+  foodResults.value = [];
   showMealForm.value = false;
-  fetchData();
+  
+  // Refresh dashboard data
+  await fetchData();
 }
 
 async function addWater() {
@@ -471,6 +494,7 @@ async function addWater() {
 async function addNutrition() {
   if (!nutritionCarbs.value && !nutritionProtein.value && !nutritionFat.value)
     return;
+  const today = new Date().toISOString().split("T")[0];
   const calories =
     (nutritionCarbs.value || 0) * 4 +
     (nutritionProtein.value || 0) * 4 +
@@ -478,6 +502,7 @@ async function addNutrition() {
   await supabase.from("nutrition").insert([
     {
       user_id: user.id,
+      date: today,
       carbs: nutritionCarbs.value || 0,
       protein: nutritionProtein.value || 0,
       fat: nutritionFat.value || 0,
