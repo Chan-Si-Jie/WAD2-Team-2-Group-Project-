@@ -18,24 +18,6 @@
         >
           📊 Overview
         </button>
-        <button
-          :class="{ active: activeTab === 'challenges' }"
-          @click="activeTab = 'challenges'"
-        >
-          🎯 Challenges
-        </button>
-        <button
-          :class="{ active: activeTab === 'achievements' }"
-          @click="activeTab = 'achievements'"
-        >
-          🏅 Achievements
-        </button>
-        <button
-          :class="{ active: activeTab === 'leaderboard' }"
-          @click="activeTab = 'leaderboard'"
-        >
-          🏁 Leaderboard
-        </button>
       </div>
 
       <!-- Overview Tab -->
@@ -52,10 +34,6 @@
             <span>{{ userXP }}/{{ xpForNextLevel }} XP</span>
           </div>
           <div class="card">
-            <h3>Badges</h3>
-            <p>{{ badges.length }}</p>
-          </div>
-          <div class="card">
             <h3>Daily Streak</h3>
             <p>🔥 {{ dailyStreak }} days</p>
           </div>
@@ -65,92 +43,6 @@
         <div class="chart-section">
           <h3>Points Over Last 7 Days</h3>
           <canvas id="pointsChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Challenges Tab -->
-      <div v-if="activeTab === 'challenges'" class="tab-content">
-        <div class="filter-row">
-          <label>Filter by category:</label>
-          <select v-model="challengeFilter">
-            <option value="all">All</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="special">Special</option>
-          </select>
-        </div>
-
-        <div class="challenges-grid">
-          <div
-            v-for="challenge in filteredChallenges"
-            :key="challenge.id"
-            class="challenge-card"
-            :class="{ completed: challenge.progress === 100 }"
-            @click="viewChallenge(challenge)"
-          >
-            <span class="category-badge" :class="challenge.category">{{
-              challenge.category.toUpperCase()
-            }}</span>
-            <h3>{{ challenge.name }}</h3>
-            <p>{{ challenge.description }}</p>
-
-            <div class="progress-wrapper">
-              <div
-                class="progress-bar"
-                :class="{ completed: challenge.progress === 100 }"
-                :style="{ width: challenge.progress + '%' }"
-              ></div>
-            </div>
-            <span class="progress-text"
-              >{{ challenge.progress }}% Complete</span
-            >
-
-            <div class="reward-section">
-              <span class="reward-points"
-                >💰 {{ challenge.rewardPoints }} pts</span
-              >
-              <span class="reward-xp">⭐ {{ challenge.rewardXP }} XP</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Achievements Tab -->
-      <div v-if="activeTab === 'achievements'" class="tab-content">
-        <h2>🏅 Achievements</h2>
-        <div class="achievements-grid">
-          <div
-            v-for="achievement in achievements"
-            :key="achievement.id"
-            class="achievement-card"
-            :class="{ unlocked: achievement.unlocked }"
-            @click="viewAchievement(achievement)"
-          >
-            <h3>{{ achievement.title }}</h3>
-            <p>{{ achievement.description }}</p>
-            <small v-if="!achievement.unlocked"
-              >Unlock: {{ achievement.condition }}</small
-            >
-            <span class="status">{{
-              achievement.unlocked ? "Unlocked" : "Locked"
-            }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Leaderboard Tab -->
-      <div v-if="activeTab === 'leaderboard'" class="tab-content">
-        <h2>🏁 Leaderboard</h2>
-        <div class="leaderboard-list">
-          <div
-            v-for="player in filteredLeaderboard"
-            :key="player.id"
-            class="leaderboard-item"
-            :class="{ me: player.id === userState.user?.id }"
-          >
-            <span>{{ player.rank }}. {{ player.name }} {{ player.id === userState.user?.id ? '(You)' : '' }}</span>
-            <span>{{ player.points }} pts - Lv. {{ player.level }}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -406,28 +298,6 @@ const fetchChallenges = async () => {
       targetValue: challenge.target_value
     };
   });
-};
-
-// Function to manually check and update challenges
-const checkAndUpdateChallenges = async () => {
-  if (!userState.user?.id) return;
-  
-  try {
-    // Call the database function to check challenges
-    const { error } = await supabase.rpc('check_and_update_challenges', {
-      p_user_id: userState.user.id
-    });
-    
-    if (error) {
-      console.error('Error checking challenges:', error);
-    } else {
-      // Refresh challenges to show updated progress
-      await fetchChallenges();
-    }
-  } catch (err) {
-    console.error('Failed to check challenges:', err);
-  }
-
 
   console.log('✅ Challenges loaded:', challenges.value.length);
 };
@@ -622,11 +492,7 @@ const refreshAllData = async () => {
   console.log('🔄 Refreshing all data...');
   await fetchUserStats();
   await fetchAchievements();
-  
-  // Check and update challenges before fetching
-  await checkAndUpdateChallenges();
   await fetchChallenges();
-  
   await fetchLeaderboard();
   
   // Check for new achievements after fetching data
@@ -796,20 +662,22 @@ onMounted(async () => {
   display: block;
 }
 .overview-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 /* Overview Card Colors */
 .card {
   background: white;
-  padding: 1rem 1.5rem;
+  padding: 2rem 2.5rem;
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   color: #2c3e50;
+  min-width: 220px;
 }
 .card h3,
 .card p,
