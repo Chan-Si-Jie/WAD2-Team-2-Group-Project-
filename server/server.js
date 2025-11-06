@@ -362,13 +362,12 @@ This is an automated confirmation email.`;
       throw new Error(`Failed to send confirmation email: ${confirmResponse.status}`);
     }
 
-    // Step 2: Process message with Gemini AI (async, don't block response)
-    (async () => {
-      try {
-        console.log("Processing message with Gemini AI...");
+    // Step 2: Process message with Gemini AI (MUST AWAIT in serverless environment)
+    try {
+      console.log("Processing message with Gemini AI...");
 
-        // Create prompt for Gemini
-        const prompt = `You are a helpful customer support assistant for SmartCal, a smart calorie tracking and nutrition app. 
+      // Create prompt for Gemini
+      const prompt = `You are a helpful customer support assistant for SmartCal, a smart calorie tracking and nutrition app. 
 
 A user named ${name} has sent the following message:
 "${message}"
@@ -383,15 +382,15 @@ Please provide a helpful, friendly, and professional response addressing their i
 
 Keep the response concise (3-5 paragraphs), warm, and helpful. Sign off as "The SmartCal Support Team".`;
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const aiResponse = response.text();
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const aiResponse = response.text();
 
-        console.log("AI Response generated, sending follow-up email...");
+      console.log("AI Response generated, sending follow-up email...");
 
-        // Step 3: Send AI-generated response email
-        const responseBody = `Hi ${name},
+      // Step 3: Send AI-generated response email
+      const responseBody = `Hi ${name},
 
 ${aiResponse}
 
@@ -400,45 +399,46 @@ If you have any other questions or need further assistance, feel free to reply t
 Best regards,
 The SmartCal Support Team`;
 
-        const responseEmail = {
-          personalizations: [
-            {
-              to: [{ email: email, name: name }],
-              subject: "Re: Your SmartCal Inquiry - AI Response",
-            },
-          ],
-          from: {
-            email: "jaykinchan@gmail.com",
-            name: "SmartCal Team",
+      const responseEmail = {
+        personalizations: [
+          {
+            to: [{ email: email, name: name }],
+            subject: "Re: Your SmartCal Inquiry - AI Response",
           },
-          content: [
-            {
-              type: "text/plain",
-              value: responseBody,
-            },
-          ],
-        };
-
-        const aiEmailResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${SENDGRID_API_KEY}`,
+        ],
+        from: {
+          email: "jaykinchan@gmail.com",
+          name: "SmartCal Team",
+        },
+        content: [
+          {
+            type: "text/plain",
+            value: responseBody,
           },
-          body: JSON.stringify(responseEmail),
-        });
+        ],
+      };
 
-        if (aiEmailResponse.status === 202 || aiEmailResponse.status === 200) {
-          console.log("AI response email sent successfully to:", email);
-        } else {
-          console.error("Failed to send AI response email:", aiEmailResponse.status);
-        }
-      } catch (error) {
-        console.error("Error processing AI response:", error);
+      const aiEmailResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${SENDGRID_API_KEY}`,
+        },
+        body: JSON.stringify(responseEmail),
+      });
+
+      if (aiEmailResponse.status === 202 || aiEmailResponse.status === 200) {
+        console.log("AI response email sent successfully to:", email);
+      } else {
+        const errorText = await aiEmailResponse.text();
+        console.error("Failed to send AI response email:", aiEmailResponse.status, errorText);
       }
-    })();
+    } catch (aiError) {
+      console.error("Error processing AI response:", aiError);
+      // Don't fail the whole request if AI email fails
+    }
 
-    // Return success immediately after confirmation email
+    // Return success after both emails are sent
     res.json({
       success: true,
       message: "Message sent successfully! Check your email for confirmation and an AI-powered response.",
