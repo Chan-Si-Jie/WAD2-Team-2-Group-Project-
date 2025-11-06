@@ -270,22 +270,27 @@ function clearSearch() {
 }
 
 const fetchExercises = async (query = "") => {
+  if (!query) {
+    clearSearch();
+    return;
+  }
+
   loadingExercises.value = true;
   errorMsg.value = "";
+
   try {
-    const res = await fetch(
-      `https://api.api-ninjas.com/v1/exercises?name=${query}`,
-      {
-        headers: {
-          "X-Api-Key": "RRnhq5AQeDNDMn8ZE4wnRg==EjF1usAVwUteBQwB", // Replace with your actual key
-        },
-      }
-    );
+    const res = await fetch(`/api/exercises?name=${encodeURIComponent(query)}`);
 
     if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
 
     const data = await res.json();
-    exercises.value = data;
+
+    // Use raw array from backend
+    exercises.value = data.length ? data : [];
+
+    if (!exercises.value.length) {
+      errorMsg.value = "No exercises found for this search.";
+    }
   } catch (err) {
     console.error(err);
     errorMsg.value = "Failed to load exercises. Please try again.";

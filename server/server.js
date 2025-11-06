@@ -20,6 +20,25 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Server is running" });
 });
 
+app.get("/api/exercises", async (req, res) => {
+  const name = req.query.name;
+  try {
+    const response = await fetch(
+      `https://api.api-ninjas.com/v1/exercises?name=${name}`,
+      {
+        headers: {
+          "X-API-Key": process.env.NINJA_API_KEY, // key from .env
+        },
+      }
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch exercises" });
+  }
+});
+
 // Recommendation endpoint
 app.post("/api/recommendation", async (req, res) => {
   try {
@@ -115,7 +134,7 @@ app.get("/api/food/search", async (req, res) => {
     }
 
     const USDA_API_KEY = process.env.USDA_API_KEY;
-    
+
     if (!USDA_API_KEY) {
       return res.status(500).json({
         error: "USDA API key not configured",
@@ -185,7 +204,7 @@ app.get("/api/recipes/search", async (req, res) => {
     }
 
     const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
-    
+
     if (!SPOONACULAR_API_KEY) {
       return res.status(500).json({
         error: "Spoonacular API key not configured",
@@ -220,7 +239,7 @@ app.get("/api/recipes/search", async (req, res) => {
 app.get("/api/recipes/random", async (req, res) => {
   try {
     const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
-    
+
     if (!SPOONACULAR_API_KEY) {
       return res.status(500).json({
         error: "Spoonacular API key not configured",
@@ -262,7 +281,7 @@ app.get("/api/recipes/:id", async (req, res) => {
     }
 
     const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
-    
+
     if (!SPOONACULAR_API_KEY) {
       return res.status(500).json({
         error: "Spoonacular API key not configured",
@@ -303,7 +322,9 @@ app.post("/api/contact/send", async (req, res) => {
       });
     }
 
-    const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "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";
+    const SENDGRID_API_KEY =
+      process.env.SENDGRID_API_KEY ||
+      "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";
 
     // Step 1: Send immediate confirmation email
     const confirmationBody = `Thank you for contacting SmartCal!
@@ -345,21 +366,26 @@ This is an automated confirmation email.`;
     console.log("Sending confirmation email to:", email);
 
     // Send confirmation email
-    const confirmResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${SENDGRID_API_KEY}`,
-      },
-      body: JSON.stringify(confirmationEmail),
-    });
+    const confirmResponse = await fetch(
+      "https://api.sendgrid.com/v3/mail/send",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${SENDGRID_API_KEY}`,
+        },
+        body: JSON.stringify(confirmationEmail),
+      }
+    );
 
     console.log("Confirmation email status:", confirmResponse.status);
 
     if (confirmResponse.status !== 202 && confirmResponse.status !== 200) {
       const errorData = await confirmResponse.text();
       console.error("SendGrid Error:", errorData);
-      throw new Error(`Failed to send confirmation email: ${confirmResponse.status}`);
+      throw new Error(
+        `Failed to send confirmation email: ${confirmResponse.status}`
+      );
     }
 
     // Step 2: Process message with Gemini AI (MUST AWAIT in serverless environment)
@@ -418,20 +444,27 @@ The SmartCal Support Team`;
         ],
       };
 
-      const aiEmailResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${SENDGRID_API_KEY}`,
-        },
-        body: JSON.stringify(responseEmail),
-      });
+      const aiEmailResponse = await fetch(
+        "https://api.sendgrid.com/v3/mail/send",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${SENDGRID_API_KEY}`,
+          },
+          body: JSON.stringify(responseEmail),
+        }
+      );
 
       if (aiEmailResponse.status === 202 || aiEmailResponse.status === 200) {
         console.log("AI response email sent successfully to:", email);
       } else {
         const errorText = await aiEmailResponse.text();
-        console.error("Failed to send AI response email:", aiEmailResponse.status, errorText);
+        console.error(
+          "Failed to send AI response email:",
+          aiEmailResponse.status,
+          errorText
+        );
       }
     } catch (aiError) {
       console.error("Error processing AI response:", aiError);
@@ -441,7 +474,8 @@ The SmartCal Support Team`;
     // Return success after both emails are sent
     res.json({
       success: true,
-      message: "Message sent successfully! Check your email for confirmation and an AI-powered response.",
+      message:
+        "Message sent successfully! Check your email for confirmation and an AI-powered response.",
     });
   } catch (error) {
     console.error("Error sending contact email:", error);
@@ -453,7 +487,7 @@ The SmartCal Support Team`;
 });
 
 // Start server (for local development)
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📊 API endpoint: http://localhost:${PORT}/api/recommendation`);
