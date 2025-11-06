@@ -194,6 +194,52 @@
             <p class="empty-text">No workouts logged yet.</p>
             <p class="empty-subtext">Start your fitness journey today!</p>
           </div>
+
+          <!-- Exercise Suggestions Section -->
+          <div class="suggestions-section">
+            <div class="section-header">
+              <h2>🧠 Exercise Finder</h2>
+              <p class="subtitle">Find a workout for today 💪</p>
+            </div>
+
+            <div class="search-bar">
+              <input
+                v-model="searchMuscle"
+                placeholder="Search for workouts to try out today"
+                class="log-input"
+              />
+              <button @click="fetchExercises(searchMuscle)" class="add-btn">
+                🔍 Search
+              </button>
+              <button
+                v-if="searchMuscle || exercises.length"
+                @click="clearSearch"
+                class="clear-btn"
+              >
+                ✖ Clear
+              </button>
+            </div>
+
+            <div v-if="loadingExercises" class="loading">
+              Loading exercises...
+            </div>
+            <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
+
+            <div v-if="exercises.length" class="exercise-list">
+              <div
+                v-for="ex in exercises.slice(0, 5)"
+                :key="ex.name"
+                class="exercise-card"
+              >
+                <h3>{{ ex.name }}</h3>
+                <p><strong>Muscle:</strong> {{ ex.muscle }}</p>
+                <p><strong>Type:</strong> {{ ex.type }}</p>
+                <p><strong>Equipment:</strong> {{ ex.equipment }}</p>
+                <p><strong>Difficulty:</strong> {{ ex.difficulty }}</p>
+                <p><strong>Instructions:</strong> {{ ex.instructions }}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -212,6 +258,41 @@ const weeklyGoal = ref(5);
 const workoutType = ref("");
 const minutes = ref("");
 const workouts = ref([]);
+const exercises = ref([]);
+const loadingExercises = ref(false);
+const errorMsg = ref("");
+const searchMuscle = ref("");
+
+function clearSearch() {
+  searchMuscle.value = "";
+  exercises.value = [];
+  errorMsg.value = "";
+}
+
+const fetchExercises = async (query = "") => {
+  loadingExercises.value = true;
+  errorMsg.value = "";
+  try {
+    const res = await fetch(
+      `https://api.api-ninjas.com/v1/exercises?name=${query}`,
+      {
+        headers: {
+          "X-Api-Key": "RRnhq5AQeDNDMn8ZE4wnRg==EjF1usAVwUteBQwB", // Replace with your actual key
+        },
+      }
+    );
+
+    if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+
+    const data = await res.json();
+    exercises.value = data;
+  } catch (err) {
+    console.error(err);
+    errorMsg.value = "Failed to load exercises. Please try again.";
+  } finally {
+    loadingExercises.value = false;
+  }
+};
 
 const calorieRates = {
   Running: 10,
@@ -515,6 +596,41 @@ onMounted(() => loadData());
     transform: scale(1);
     opacity: 1;
   }
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.add-btn {
+  background-color: #3b82f6;
+  color: #fff;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.add-btn:hover {
+  background-color: #2563eb;
+}
+
+.clear-btn {
+  background-color: #ef4444;
+  color: #fff;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.clear-btn:hover {
+  background-color: #dc2626;
 }
 
 .subtitle {
@@ -1253,5 +1369,43 @@ html {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #1e40af;
+}
+.suggestions-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f9fafb 0%, #e0f2fe 100%);
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.exercise-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.exercise-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.exercise-card:hover {
+  transform: translateY(-5px);
+}
+
+.loading,
+.error {
+  text-align: center;
+  font-weight: 600;
 }
 </style>
