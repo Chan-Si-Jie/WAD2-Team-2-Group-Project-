@@ -213,6 +213,8 @@ import NutritionPieChart from "@/components/NutritionPieChart.vue";
 import CaloriesLineChart from "@/components/CaloriesLineChart.vue";
 import WaterBarChart from "./WaterBarChart.vue";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const user = userState.user;
 
 // Daily totals
