@@ -88,12 +88,14 @@ SmartCal is a comprehensive nutrition tracking and meal planning application tha
 
 ### 🏆 Gamification & Social Features
 - **Points System**: Earn 10 points for every meal logged
-- **Achievements**: Unlock 6 achievements (First Steps, Week Warrior, Century Club, etc.)
-- **Daily Streaks**: Track consecutive days of meal logging
-- **Leaderboard**: Compete with other users
-- **Challenges**: Complete daily, weekly, and special challenges
 - **Level System**: Progress through levels (100 points per level)
-- **Progress Visualization**: Charts showing points earned over last 7 days
+- **Daily Streaks**: Track consecutive days of meal logging
+- **Total Meals Counter**: See how many meals you've logged
+- **Simple Overview Dashboard**: Clean interface showing your progress
+  - Current Points
+  - Current Level with XP progress bar
+  - Daily Streak count
+  - Total Meals logged
 
 ### 📊 Dashboard & Analytics
 - **Daily Summary**: View today's total calories and water intake
@@ -281,18 +283,18 @@ The application will be available at:
   - AI analyzes your inquiry and provides relevant information about SmartCal features
 
 ### Social & Gamification
-- **Overview Tab**: View points, level, badges, and streak
-- **Challenges Tab**: Complete daily, weekly, and special challenges
-- **Achievements Tab**: Track and unlock achievements
-- **Leaderboard Tab**: Compare your progress with others
+- **Overview Tab**: View points, level, daily streak, and total meals logged
+  - Points earned (10 per meal)
+  - Current level with XP progress bar (100 XP per level)
+  - Daily streak counter
+  - Total meals logged
+- **Refresh Stats Button**: Updates your statistics in real-time
 
-### Achievements to Unlock
-1. 🎯 **First Steps** - Log your first meal (1 meal)
-2. 🔥 **Week Warrior** - 7-day logging streak
-3. 👑 **Month Master** - 30-day logging streak
-4. 💯 **Century Club** - Log 100 meals
-5. ⭐ **Consistency King** - 50-day streak
-6. 🥷 **Nutrition Ninja** - Log 500 meals
+### How Points Work
+- **10 points** awarded automatically when you log a meal
+- **Level up** every 100 points (Level 1 = 0-99 points, Level 2 = 100-199 points, etc.)
+- **Daily Streak** increases when you log meals on consecutive days
+- **Database triggers** automatically calculate and update your stats
 
 ---
 
@@ -313,10 +315,8 @@ The application requires the following tables (auto-created by `setup_gamificati
 
 #### Gamification Tables
 - `user_stats` - Points, levels, streaks, total meals
-- `achievements` - Achievement definitions
-- `user_achievements` - Unlocked achievements per user
-- `challenges` - Challenge definitions
-- `user_challenges` - Challenge progress per user
+- `achievements` - Achievement definitions (for future expansion)
+- `user_achievements` - Unlocked achievements per user (for future expansion)
 
 ### Database Triggers
 
