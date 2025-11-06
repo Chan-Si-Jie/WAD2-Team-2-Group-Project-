@@ -21,10 +21,12 @@ app.get("/api/health", (req, res) => {
 });
 
 app.get("/api/exercises", async (req, res) => {
-  const name = req.query.name;
+  const name = req.query.name; // e.g., /api/exercises?name=pushup
   try {
     const response = await fetch(
-      `https://api.api-ninjas.com/v1/exercises?name=${name}`,
+      `https://api.api-ninjas.com/v1/exercises?name=${encodeURIComponent(
+        name
+      )}`,
       {
         headers: {
           "X-API-Key": process.env.NINJA_API_KEY, // key from .env
