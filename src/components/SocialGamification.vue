@@ -37,12 +37,10 @@
             <h3>Daily Streak</h3>
             <p>🔥 {{ dailyStreak }} days</p>
           </div>
-        </div>
-
-        <!-- Chart: Points over last 7 days -->
-        <div class="chart-section">
-          <h3>Points Over Last 7 Days</h3>
-          <canvas id="pointsChart"></canvas>
+          <div class="card">
+            <h3>Total Meals</h3>
+            <p>🍽️ {{ totalMealsLogged }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -95,7 +93,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import Navbar from "@/components/Navbar.vue";
-import Chart from "chart.js/auto";
 import { supabase } from "@/supabase";
 import { userState } from "@/state/userState";
 
@@ -165,15 +162,15 @@ const fetchUserStats = async () => {
     await initializeUserStats();
   } else if (data) {
     console.log('✅ User stats loaded:', data);
-    userPoints.value = data.total_points || 0;
+    userPoints.value = data.points || 0;
     dailyStreak.value = data.current_streak || 0;
-    totalMealsLogged.value = data.total_meals_logged || 0;
+    totalMealsLogged.value = data.total_meals || 0;
     
     // Calculate level based on points (100 points per level)
-    userLevel.value = Math.floor((data.total_points || 0) / 100) + 1;
+    userLevel.value = Math.floor((data.points || 0) / 100) + 1;
     
     // Calculate XP (points within current level)
-    userXP.value = (data.total_points || 0) % 100;
+    userXP.value = (data.points || 0) % 100;
   } else {
     console.log('No stats found, initializing...');
     await initializeUserStats();
@@ -190,10 +187,10 @@ const initializeUserStats = async () => {
     .from('user_stats')
     .insert([{
       user_id: userState.user.id,
-      total_points: 0,
+      points: 0,
       current_streak: 0,
       longest_streak: 0,
-      total_meals_logged: 0
+      total_meals: 0
     }])
     .select()
     .single();
@@ -304,11 +301,11 @@ const fetchChallenges = async () => {
 
 // Fetch leaderboard
 const fetchLeaderboard = async () => {
-  // Get all users with stats, sorted by total_points
+  // Get all users with stats, sorted by points
   const { data: statsData, error: statsError } = await supabase
     .from('user_stats')
-    .select('user_id, total_points, current_streak, total_meals')
-    .order('total_points', { ascending: false })
+    .select('user_id, points, current_streak, total_meals')
+    .order('points', { ascending: false })
     .limit(20);
 
   if (statsError) {
@@ -349,7 +346,7 @@ const fetchLeaderboard = async () => {
 
   // Build leaderboard with actual stats
   leaderboard.value = statsData.map((entry, index) => {
-    const points = entry.total_points || 0;
+    const points = entry.points || 0;
     // Calculate level from points (100 points = level 1, 200 = level 2, etc.)
     const calculatedLevel = Math.floor(points / 100) + 1;
     
@@ -395,7 +392,7 @@ const completeChallenge = async (id) => {
   const { error: statsError } = await supabase
     .from('user_stats')
     .update({
-      total_points: userPoints.value + ch.rewardPoints
+      points: userPoints.value + ch.rewardPoints
     })
     .eq('user_id', userState.user.id);
 
@@ -501,97 +498,13 @@ const refreshAllData = async () => {
   console.log('✅ All data refreshed!');
 };
 
-// Get points for last 7 days
-const getPointsLast7Days = async () => {
-  if (!userState.user) return Array(7).fill(0);
-
-  const today = new Date();
-  const last7Days = [];
-  
-  // Get dates for last 7 days
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    last7Days.push(date.toISOString().split('T')[0]);
-  }
-
-  // Count meals per day (each meal = 10 points)
-  const { data: meals } = await supabase
-    .from('planned_meals')
-    .select('date')
-    .eq('user_id', userState.user.id)
-    .gte('date', last7Days[0])
-    .lte('date', last7Days[6]);
-
-  // Count meals per day
-  const mealCounts = {};
-  meals?.forEach(meal => {
-    mealCounts[meal.date] = (mealCounts[meal.date] || 0) + 1;
-  });
-
-  // Convert to points (10 points per meal) and cumulative
-  let cumulative = 0;
-  return last7Days.map(date => {
-    const dailyMeals = mealCounts[date] || 0;
-    cumulative += dailyMeals * 10;
-    return cumulative;
-  });
-};
-
-// Chart
-let chartInstance = null;
+// Chart removed - using simple card display instead
 
 onMounted(async () => {
   console.log('🎮 Social Gamification component mounted');
   
   // Fetch all data
   await refreshAllData();
-
-  // Get actual points data
-  const pointsData = await getPointsLast7Days();
-  
-  // Get day labels
-  const today = new Date();
-  const dayLabels = [];
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-    dayLabels.push(dayName);
-  }
-
-  // Initialize chart
-  const ctx = document.getElementById("pointsChart")?.getContext("2d");
-  if (ctx) {
-    chartInstance = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: dayLabels,
-        datasets: [{
-          label: "Total Points",
-          data: pointsData,
-          borderColor: "#3498db",
-          backgroundColor: "rgba(52,152,219,0.2)",
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { 
-          legend: { display: true },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return 'Points: ' + context.parsed.y;
-              }
-            }
-          }
-        },
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-  }
 });
 </script>
 
@@ -885,18 +798,7 @@ onMounted(async () => {
   color: white;
 }
 
-/* Chart Section */
-.chart-section {
-  background: white;
-  padding: 1rem;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 2rem;
-  color: #2c3e50;
-}
-.chart-section h3 {
-  color: #2c3e50;
-}
+/* Chart Section - Removed */
 
 /* RESPONSIVE DESIGN */
 @media (max-width: 1200px) {
@@ -993,10 +895,6 @@ onMounted(async () => {
     width: 95%;
     max-width: 450px;
     padding: 1.5rem;
-  }
-
-  .chart-section {
-    padding: 1rem;
   }
 
   .refresh-btn {

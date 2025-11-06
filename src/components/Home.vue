@@ -847,6 +847,13 @@ body {
   .feature-grid {
     grid-template-columns: repeat(2, 1fr);
     max-width: 900px;
+    margin: 0 auto;
+    justify-items: center;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 380px;
   }
 }
 
@@ -905,6 +912,13 @@ body {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     max-width: 400px;
+    margin: 0 auto;
+    justify-items: center;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 350px;
   }
 
   .about-container {
@@ -919,11 +933,18 @@ body {
 
   .about-image img {
     max-width: 80%;
+    margin: 0 auto;
   }
 
   .contact-grid {
     grid-template-columns: 1fr;
     gap: 30px;
+  }
+
+  .contact-info {
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .contact-form-wrapper {
@@ -936,6 +957,7 @@ body {
 
   .info-card {
     max-width: 100%;
+    margin: 0 auto;
   }
 }
 
@@ -973,10 +995,14 @@ body {
 
   .feature-grid {
     max-width: 100%;
+    padding: 0 15px;
+    justify-items: center;
   }
 
   .card {
     padding: 20px 15px;
+    width: 100%;
+    max-width: 320px;
   }
 
   .card img {
@@ -989,10 +1015,13 @@ body {
 
   .contact-header p {
     font-size: 0.9rem;
+    padding: 0 10px;
   }
 
   .contact-form-wrapper {
     padding: 25px 15px;
+    margin: 0 auto;
+    max-width: 100%;
   }
 
   .form-header h3 {
