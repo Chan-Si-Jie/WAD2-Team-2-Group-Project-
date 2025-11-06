@@ -326,7 +326,8 @@ function updateNutritionFromFood() {
   const f = selectedFoodData.value;
   const factor = foodAmount.value / 100; // USDA data is per 100g 
 
-  mealName.value = '${f.name} - ${foodAmount.value}g';
+
+  mealName.value = f.name + " - " + foodAmount.value + "g";
   mealCalories.value = Math.round(f.calories * factor);
   mealCarbs.value = Number((f.carbs * factor).toFixed(1));
   mealProtein.value = Number((f.protein * factor).toFixed(1));
