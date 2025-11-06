@@ -73,6 +73,17 @@
               </select>
             </div>
 
+              <!-- Amount eaten (grams) -->
+            <div v-if="selectedFoodData" class="meal-type-selector">
+              <label>Amount (grams):</label>
+              <input
+                v-model.number="foodAmount"
+                type="number"
+                min="1"
+                placeholder="e.g. 150"
+              />
+            </div>
+
             <input
               v-model.number="mealCalories"
               type="number"
@@ -205,7 +216,7 @@
 </template>
 
 <script setup>
-import { ref, watchEffect } from "vue";
+import { ref, watch, watchEffect } from "vue";
 import { supabase } from "@/supabase";
 import { userState } from "@/state/userState";
 import Navbar from "@/components/Navbar.vue";
@@ -249,6 +260,7 @@ const foodQuery = ref("");
 const foodResults = ref([]);
 const searchingFood = ref(false);
 const selectedFoodData = ref(null);
+const foodAmount = ref(100); // Default to 100grams
 let searchTimeout = null;
 
 // Search food function - now calls backend API
@@ -292,15 +304,39 @@ async function searchFood() {
 
 // Select food from search results
 function selectFood(food) {
-  mealName.value = food.name + " - " + food.serving;
-  mealCalories.value = Math.round(food.calories);
-  mealCarbs.value = food.carbs;
-  mealProtein.value = food.protein;
-  mealFat.value = food.fat;
+  // mealName.value = food.name + " - " + food.serving;
+  // mealCalories.value = Math.round(food.calories);
+  // mealCarbs.value = food.carbs;
+  // mealProtein.value = food.protein;
+  // mealFat.value = food.fat;
+  // selectedFoodData.value = food;
+
   selectedFoodData.value = food;
+  foodAmount.value = 100; // default to 100 grams 
+
+  updateNutritionFromFood(); // fill calories and macros based on amount
+
   foodQuery.value = "";
   foodResults.value = [];
 }
+
+function updateNutritionFromFood() {
+  if (!selectedFoodData.value || !foodAmount.value) return;
+
+  const f = selectedFoodData.value;
+  const factor = foodAmount.value / 100; // USDA data is per 100g 
+
+  mealName.value = '${f.name} - ${foodAmount.value}g';
+  mealCalories.value = Math.round(f.calories * factor);
+  mealCarbs.value = Number((f.carbs * factor).toFixed(1));
+  mealProtein.value = Number((f.protein * factor).toFixed(1));
+  mealFat.value = Number((f.fat * factor).toFixed(1));
+
+} 
+
+watch(foodAmount, () => {
+  updateNutritionFromFood();
+  });
 
 // Close meal form and reset
 function closeMealForm() {
@@ -314,6 +350,7 @@ function closeMealForm() {
   selectedFoodData.value = null;
   foodQuery.value = "";
   foodResults.value = [];
+  foodAmount.value = 100; // reset grams 
 }
 
 // Get today's date
