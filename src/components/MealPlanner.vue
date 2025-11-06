@@ -410,7 +410,7 @@ const suggestedRecipes = ref([]);
 const recipeSearchQuery = ref("");
 const loadingSuggested = ref(false);
 const suggestedRecipesError = ref(null);
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 // Modals
 const showMealSelector = ref(false);

@@ -219,7 +219,7 @@ import { ref } from "vue";
 import Navbar from "../components/Navbar.vue";
 import AnimatedModel from "../components/AnimatedModel.vue";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const contactForm = ref({
   name: "",

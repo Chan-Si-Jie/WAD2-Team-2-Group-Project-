@@ -213,8 +213,6 @@ import NutritionPieChart from "@/components/NutritionPieChart.vue";
 import CaloriesLineChart from "@/components/CaloriesLineChart.vue";
 import WaterBarChart from "./WaterBarChart.vue";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
 const user = userState.user;
 
 // Daily totals
@@ -267,8 +265,8 @@ async function searchFood() {
   searchTimeout = setTimeout(async () => {
     try {
       const query = encodeURIComponent(foodQuery.value);
-      const url = `${import.meta.env.VITE_API_URL || "http://localhost:3000"
-      }/api/food/search?query=${query}`;
+      const apiUrl = import.meta.env.VITE_API_URL || "";
+      const url = `${apiUrl}/api/food/search?query=${query}`;
 
       const response = await fetch(url);
 
@@ -599,10 +597,9 @@ async function getRecommendation() {
     };
 
     // Call your backend API for AI recommendation
+    const apiUrl = import.meta.env.VITE_API_URL || "";
     const response = await fetch(
-      `${
-        import.meta.env.VITE_API_URL || "http://localhost:3000"
-      }/api/recommendation`,
+      `${apiUrl}/api/recommendation`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
