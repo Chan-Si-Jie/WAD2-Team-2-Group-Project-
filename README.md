@@ -11,9 +11,19 @@
 
 **Track your calories effortlessly with AI-powered recommendations, recipe suggestions, and intelligent email support**
 
+🔗 **[Live Demo](https://wad-2-team-2-group-project.vercel.app/)** | 📦 **[GitHub Repository](https://github.com/Chan-Si-Jie/WAD2-Team-2-Group-Project-)**
+
 [Features](#-features) • [Tech Stack](#-tech-stack) • [Installation](#-installation) • [Usage](#-usage) • [API Integrations](#-api-integrations)
 
 </div>
+
+---
+
+## 🚀 Quick Links
+
+- **Live Application**: https://wad-2-team-2-group-project.vercel.app/
+- **GitHub Repository**: https://github.com/Chan-Si-Jie/WAD2-Team-2-Group-Project-
+- **Deployed on**: Vercel (Frontend + Serverless Backend)
 
 ---
 
